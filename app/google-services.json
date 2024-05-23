@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "434635194953",
+    "project_id": "analytical-8e3db",
+    "storage_bucket": "analytical-8e3db.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:434635194953:android:3970eb1c5ae98a6d137598",
+        "android_client_info": {
+          "package_name": "com.ketchupzzz.analytical"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBogpzs_BNxZzn7Ak5K8VLSk7BP3xbKnf0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

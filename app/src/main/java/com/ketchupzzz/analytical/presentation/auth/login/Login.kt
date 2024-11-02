@@ -25,7 +25,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -38,24 +40,28 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.ketchupzzz.analytical.R
-import com.ketchupzzz.analytical.presentation.navigation.Register
-import com.ketchupzzz.analytical.presentation.navigation.Root
+import com.ketchupzzz.analytical.presentation.navigation.AppRouter
+
 import com.ketchupzzz.analytical.ui.custom.PrimaryButton
 import com.ketchupzzz.analytical.ui.theme.AnalyticalTheme
 import com.ketchupzzz.analytical.ui.custom.primaryTextFieldColors
 
 
 @Composable
-fun LoginScreen(modifier: Modifier = Modifier,
-                navHostController: NavHostController,
-                state : LoginState,
-                events : (LoginEvents) -> Unit
+fun LoginScreen(
+    modifier: Modifier = Modifier,
+    navHostController: NavHostController,
+    state : LoginState,
+    events: (LoginEvents) -> Unit
 ) {
+
     LaunchedEffect(state.isLoggedIn) {
         if (state.isLoggedIn) {
-            navHostController.navigate(Root.route) {
+            navHostController.navigate(AppRouter.MainRoutes.route) {
                 popUpTo(navHostController.graph.startDestinationId) {
                     inclusive = true
                 }
@@ -63,27 +69,32 @@ fun LoginScreen(modifier: Modifier = Modifier,
             }
         }
     }
-    Surface(modifier = modifier.fillMaxSize(), color = MaterialTheme.colorScheme.primary) {
+
+    Surface(modifier = modifier.fillMaxSize()) {
         Column(modifier = modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Bottom, horizontalAlignment = Alignment.CenterHorizontally) {
-            Column(modifier = modifier.weight(1f),verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                Image(
-                    painter = painterResource(id = R.drawable.logo),
-                    contentDescription = "Login",
-                    modifier = modifier
-                        .height(200.dp)
-                        .width(200.dp)
-                        .padding(16.dp)
-                )
-                Text(text = "Analytical Games",color = MaterialTheme.colorScheme.background, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-            }
+            Image(
+                painter = painterResource(id = R.drawable.login_bg),
+                contentDescription = "Login BG",
+                contentScale = ContentScale.Crop,
+                modifier = modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .clip(
+                        shape = RoundedCornerShape(
+                            bottomStart = 16.dp,
+                            bottomEnd = 16.dp
+                        )
+                    )
+            )
 
             LoginForm(
                 modifier = modifier,
+                navHostController = navHostController,
                 state = state,
                 events = events,
                 onRegister = {
-                    navHostController.navigate(Register.route)
+                    navHostController.navigate(AppRouter.RegisterScreen.route)
                 }
             )
         }
@@ -93,21 +104,20 @@ fun LoginScreen(modifier: Modifier = Modifier,
 
 
 @Composable
-fun LoginForm(modifier: Modifier = Modifier,state : LoginState, events : (LoginEvents) -> Unit ,onRegister : () -> Unit) {
+fun LoginForm(modifier: Modifier = Modifier,navHostController: NavHostController,state : LoginState, events : (LoginEvents) -> Unit ,onRegister : () -> Unit) {
     Box(modifier = modifier
         .wrapContentSize()
         .background(
-            Color.White,
+            color = MaterialTheme.colorScheme.surface,
             shape = RoundedCornerShape(
                 topStart = 24.dp,
                 topEnd = 24.dp,
 
-            )
+                )
         )) {
         Column(modifier = modifier
-            .padding(16.dp)
-            .wrapContentSize()
-            .background(Color.White),
+            .padding(8.dp)
+            .wrapContentSize(),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -118,10 +128,9 @@ fun LoginForm(modifier: Modifier = Modifier,state : LoginState, events : (LoginE
                     append(stringResource(R.string.s))
                 },
                 style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold,
-                color = Color.Black,
+                color = MaterialTheme.colorScheme.onSurface,
                 modifier = modifier.padding(16.dp)
             )
-            Spacer(modifier = modifier.height(16.dp))
             TextField(state.studentID.value,
                 onValueChange = {
                     events(LoginEvents.OnStudentIDChanged(it))
@@ -134,8 +143,6 @@ fun LoginForm(modifier: Modifier = Modifier,state : LoginState, events : (LoginE
                 supportingText = {
                     Text(
                         text =  state.studentID.errorMessage ?: "",
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.labelSmall,
                         textAlign = TextAlign.Start
                     )
                 },
@@ -147,10 +154,11 @@ fun LoginForm(modifier: Modifier = Modifier,state : LoginState, events : (LoginE
                 value = state.password.value,
                 maxLines = 1,
                 isError = state.password.isError,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+
                 onValueChange = {
                     events(LoginEvents.OnPasswordChanged(it))
                 },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 trailingIcon = {
                     IconButton(onClick = {
                         events(LoginEvents.OnTogglePasswordVisibility)
@@ -182,7 +190,7 @@ fun LoginForm(modifier: Modifier = Modifier,state : LoginState, events : (LoginE
 
                 )
             TextButton(onClick = {
-
+                navHostController.navigate(AppRouter.ForgotPasswordScreen.route)
             },modifier = modifier.align(Alignment.End)) {
                 Text(text = stringResource(R.string.forgot_password))
             }
@@ -199,15 +207,16 @@ fun LoginForm(modifier: Modifier = Modifier,state : LoginState, events : (LoginE
             TextButton(onClick = {
                 onRegister()
             }) {
-                Text(text = buildAnnotatedString {
+                Text(
+                    text = buildAnnotatedString {
                     append(stringResource(R.string.not_a_member_yet))
                     withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
                         append(stringResource(R.string.register))
                     }
                 },
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Bold
                 )
-
             }
 
         }
@@ -220,10 +229,11 @@ fun LoginForm(modifier: Modifier = Modifier,state : LoginState, events : (LoginE
 @Composable
 private fun LoginFormPreview() {
     AnalyticalTheme {
-        LoginForm(
+        LoginScreen(
             state = LoginState(),
+            navHostController = rememberNavController(),
             events = {},
-            onRegister = {}
+
         )
     }
 }

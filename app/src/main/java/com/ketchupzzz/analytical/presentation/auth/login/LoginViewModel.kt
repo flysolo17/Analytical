@@ -17,6 +17,35 @@ class LoginViewModel @Inject constructor(
 ) : ViewModel() {
     var state by mutableStateOf(LoginState())
 
+    init {
+        studentRepository.currentUser()?.let {
+            it.email?.let {
+                studentRepository.getUserByEmail(it) {
+                    when(it) {
+                        is UiState.Error -> {
+                            state = state.copy(
+                                isLoading = false,
+                                error = it.message
+                            )
+                        }
+                        UiState.Loading -> {
+                            state = state.copy(
+                                isLoading = true
+                            )
+                        }
+                        is UiState.Success -> {
+                            studentRepository.setStudent(it.data)
+                            state = state.copy(
+                                isLoading = false,
+                                isLoggedIn = true
+                            )
+                        }
+                    }
+                }
+            }
+
+        }
+    }
 
     fun onEvent(events: LoginEvents) {
         when(events) {

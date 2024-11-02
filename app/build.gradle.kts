@@ -6,6 +6,7 @@ plugins {
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
     id("com.google.gms.google-services")
+    alias(libs.plugins.jetbrains.kotlin.serialization)
 }
 
 android {
@@ -68,6 +69,7 @@ dependencies {
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.firebase.storage)
     implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -101,6 +103,14 @@ dependencies {
 
     implementation("io.coil-kt:coil-compose:2.6.0")
 
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("io.coil-kt:coil-compose:2.6.0")
+
+    implementation("androidx.compose.material:material-icons-extended:1.6.8")
+
+    implementation(libs.kotlinx.serialization.json)
+    implementation ("io.github.ehsannarmani:compose-charts:0.0.13")
 }
 
 kapt {

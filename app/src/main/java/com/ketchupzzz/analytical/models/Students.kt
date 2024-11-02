@@ -14,9 +14,14 @@ data class Students(
     val profile : String? = null,
     val email : String? = null,
 )  : Parcelable {
-    fun getFullname() : String {
-        return "$fname ${mname?.get(0)}. $lname"
-    }
+
+}
+
+
+
+
+fun Students.getFullname() : String {
+    return "$fname ${mname?.get(0)}. $lname"
 }
 
 enum class  SchoolLevel {

@@ -1,91 +1,174 @@
 package com.ketchupzzz.analytical.presentation.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavGraphBuilder
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import androidx.navigation.navigation
-import com.ketchupzzz.analytical.models.QuizWithQuestions
-
-import com.ketchupzzz.analytical.presentation.main.home.HomeScreen
-import com.ketchupzzz.analytical.presentation.main.home.HomeViewModel
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import com.ketchupzzz.analytical.presentation.auth.change_password.ChangePasswordScreen
+import com.ketchupzzz.analytical.presentation.auth.change_password.ChangePasswordViewModel
+import com.ketchupzzz.analytical.presentation.auth.edit_profile.EditProfileScreen
+import com.ketchupzzz.analytical.presentation.auth.edit_profile.EditProfileViewModel
+import com.ketchupzzz.analytical.presentation.main.category.CategoryScreen
+import com.ketchupzzz.analytical.presentation.main.category.CategoryViewModel
+import com.ketchupzzz.analytical.presentation.main.dashboard.DashboardScreen
+import com.ketchupzzz.analytical.presentation.main.dashboard.DashboardViewmodel
+import com.ketchupzzz.analytical.presentation.main.finish_game.FinishGameScreen
+import com.ketchupzzz.analytical.presentation.main.finish_game.FinishGameViewModel
+import com.ketchupzzz.analytical.presentation.main.games.GameScreen
+import com.ketchupzzz.analytical.presentation.main.games.GameViewModel
+import com.ketchupzzz.analytical.presentation.main.games.data.QuizAndLevel
+import com.ketchupzzz.analytical.presentation.main.gaming.GamingScreen
+import com.ketchupzzz.analytical.presentation.main.gaming.GamingViewModel
+import com.ketchupzzz.analytical.presentation.main.gaming.data.SubmissionData
+import com.ketchupzzz.analytical.presentation.main.leaderboard.LeaderBoardViewModel
 import com.ketchupzzz.analytical.presentation.main.leaderboard.LeaderboardScreen
 import com.ketchupzzz.analytical.presentation.main.profile.ProfileScreen
 import com.ketchupzzz.analytical.presentation.main.profile.ProfileViewModel
-import com.ketchupzzz.analytical.presentation.main.start_quiz.GamingScreen
-import com.ketchupzzz.analytical.presentation.main.start_quiz.GamingViewModel
-import com.ketchupzzz.analytical.presentation.main.view_quiz.ViewQuiz
-import com.ketchupzzz.analytical.presentation.main.view_quiz.ViewQuizViewModel
+import com.ketchupzzz.analytical.presentation.main.search.SearchScreen
+import com.ketchupzzz.analytical.presentation.main.search.SearchViewModel
+import com.ketchupzzz.analytical.presentation.main.shared.SubmissionsViewModel
+import com.ketchupzzz.analytical.utils.UnknownError
+import java.net.URLDecoder
+import java.nio.charset.StandardCharsets
 
 
 @Composable
-fun MainNavGraph(
-    navHostController: NavHostController = rememberNavController(),
-    profileViewModel: ProfileViewModel,
-    homeViewModel: HomeViewModel,
-    viewQuizViewModel: ViewQuizViewModel,
-    onLoggedOut: () -> Unit,
-    gamingViewModel: GamingViewModel
-) {
-    NavHost(navController = navHostController, startDestination = Home.route) {
-        composable(Home.route) {
-            HomeScreen(
-                navHostController = navHostController,
-                state = homeViewModel.state,
-                event = homeViewModel::onEvent
+fun MainNavGraph(navHostController: NavHostController,mainNavHostController: NavHostController) {
+    val studentViewmodel = hiltViewModel<SubmissionsViewModel>()
+
+    NavHost(
+        navController = navHostController,
+        startDestination = AppRouter.DashboardScreen.route
+    ) {
+        composable(route = AppRouter.DashboardScreen.route) {
+            val viewModel = hiltViewModel<DashboardViewmodel>()
+            val state = viewModel.state
+            val events = viewModel::events
+            DashboardScreen(navHostController = navHostController, state = state, events = events)
+        }
+        composable(route = AppRouter.LeaderboardScreen.route) {
+            val viewModel = hiltViewModel<LeaderBoardViewModel>()
+            LeaderboardScreen(
+                state= viewModel.state, events = viewModel::events,
+                navHostController = navHostController
             )
         }
-        composable(LeaderBoard.route) {
-            LeaderboardScreen()
+
+        composable(route = AppRouter.Search.route) {
+            val viewModel = hiltViewModel<SearchViewModel>()
+            val id = it.arguments?.getString("args") ?: ""
+            SearchScreen(
+                level = id,
+                state= viewModel.state,
+                events = viewModel::events,
+                navHostController = navHostController
+            )
         }
-        composable(Profile.route) {
+
+        composable("category/{args}") { backStackEntry ->
+            val args = backStackEntry.arguments?.getString("args")
+            val decodedArgs = URLDecoder.decode(args, StandardCharsets.UTF_8.toString())
+            val argsMap = parseJsonToMap(decodedArgs)
+            val schoolLevel = argsMap["schoolLevel"] ?: ""
+             val category = argsMap["category"] ?: ""
+            val viewmodel = hiltViewModel<CategoryViewModel>()
+            CategoryScreen(level = schoolLevel, category = category,
+                state = viewmodel.state, events = viewmodel::events, navHostController = navHostController)
+        }
+
+        composable(route = AppRouter.ProfileScreen.route) {
+            val viewModel = hiltViewModel<ProfileViewModel>()
             ProfileScreen(
                 navHostController = navHostController,
-                state = profileViewModel.state,
-                events = profileViewModel::onEvents,
-                onLoggedOut = onLoggedOut
+                state = viewModel.state,
+                events = viewModel::events,
+                mainNav = mainNavHostController
             )
         }
-        quizNavGraph(navController = navHostController, viewQuizViewModel = viewQuizViewModel, gamingViewModel = gamingViewModel)
+        composable(route = AppRouter.EditProfileScreen.route) {
+            val viewModel = hiltViewModel<EditProfileViewModel>()
+            EditProfileScreen(
+                navHostController = navHostController,
+                state = viewModel.state,
+                events = viewModel::events,
+            )
+        }
+
+        composable(route = AppRouter.ChangePasswordScreen.route) {
+            val viewModel = hiltViewModel<ChangePasswordViewModel>()
+            ChangePasswordScreen(
+                navHostController = navHostController,
+                state = viewModel.state,
+                events = viewModel::events,
+            )
+        }
+
+        composable(route = AppRouter.GameScreen.route) {b ->
+            val id = b.arguments?.getString("id") ?: ""
+            val viewmodel = hiltViewModel<GameViewModel>()
+            GameScreen(
+                navHostController = navHostController,
+                state = viewmodel.state,
+                e = viewmodel::events,
+                id = id
+            )
+        }
+
+        composable(
+            route = AppRouter.GamingScreen.route,
+            arguments = listOf(navArgument("quizAndLevel") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val json = backStackEntry.arguments?.getString("quizAndLevel")
+            val decodedJson = URLDecoder.decode(json, StandardCharsets.UTF_8.toString())
+            val quizAndLevel = Gson().fromJson(decodedJson, QuizAndLevel::class.java)
+
+            val viewModel = hiltViewModel<GamingViewModel>()
+            if (quizAndLevel != null) {
+                GamingScreen(
+                    s = viewModel.state,
+                    e = viewModel::events,
+                    navHostController = navHostController,
+                    args = quizAndLevel
+                )
+            } else {
+                UnknownError(
+                    title = "Page not found!",
+                    actions = {
+                        navHostController.popBackStack()
+                    }
+                )
+            }
+        }
+
+        composable(
+            route = AppRouter.FinishGameScreen.route,
+            arguments = listOf(navArgument("args") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val json = backStackEntry.arguments?.getString("args")
+            val decodedJson = URLDecoder.decode(json, StandardCharsets.UTF_8.toString())
+            val args = Gson().fromJson(decodedJson, SubmissionData::class.java)
+
+            val viewModel = hiltViewModel<FinishGameViewModel>()
+            if (args != null) {
+                FinishGameScreen(args = args, state = viewModel.state, events = viewModel::events, navHostController = navHostController)
+            } else {
+                UnknownError(
+                    title = "Page not found!",
+                    actions = {
+                        navHostController.popBackStack()
+                    }
+                )
+            }
+        }
     }
 }
 
-fun NavGraphBuilder.quizNavGraph(navController: NavHostController ,viewQuizViewModel: ViewQuizViewModel,gamingViewModel: GamingViewModel) {
-    navigation(
-        route = Quiz.route,
-        startDestination = ViewQuiz.route
-    ) {
-        composable(route = ViewQuiz.route + "/{id}", arguments = listOf(
-            navArgument("id") {
-                type = NavType.StringType
-                defaultValue = ""
-                nullable = false
-            }
-        )) { entry ->
-            val id = entry.arguments?.getString("id") ?: ""
-            ViewQuiz(state = viewQuizViewModel.state, event = viewQuizViewModel::onEvent, quizID = id, navController = navController ,
-                onStartQuiz = {
-                    navController.currentBackStackEntry?.savedStateHandle?.set("quizWithQuestions",it)
-                    navController.navigate(Gaming.route)
-                })
-        }
-
-        composable(route = Gaming.route)
-         { entry ->
-            val recipe = navController.previousBackStackEntry?.savedStateHandle?.get<QuizWithQuestions>("quizWithQuestions")
-             recipe?.let {
-                GamingScreen(
-                    navHostController = navController,
-                    quizWithQuestions = it,
-                    state = gamingViewModel.state,
-                    events = gamingViewModel::onEvents
-                )
-            }
-
-        }
-    }
+fun parseJsonToMap(json: String): Map<String, String> {
+    val mapType = object : TypeToken<Map<String, String>>() {}.type
+    return Gson().fromJson(json, mapType)
 }

@@ -4,6 +4,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.auth.User
 import com.ketchupzzz.analytical.models.SchoolLevel
 import com.ketchupzzz.analytical.models.Students
+import com.ketchupzzz.analytical.models.StudentsWithSubmissions
 import com.ketchupzzz.analytical.utils.UiState
 import kotlinx.coroutines.flow.Flow
 
@@ -36,5 +37,16 @@ interface StudentRepository {
 
     fun getUserByEmail(email : String, result : (UiState<Students>) -> Unit)
 
-    fun logout(result : (UiState<String>) -> Unit)
+    suspend  fun logout(result : (UiState<String>) -> Unit)
+    suspend fun changePassword(oldPassword : String,newPassword : String,result: (UiState<String>) -> Unit)
+
+    suspend fun editProfile(
+        id : String,
+        firstName: String,
+        middleName: String,
+        lastName: String,
+        result: (UiState<String>) -> Unit
+    )
+
+    suspend fun getStudents(result: (UiState<List<Students>>) -> Unit)
 }

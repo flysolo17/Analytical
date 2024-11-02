@@ -1,17 +1,23 @@
 package com.ketchupzzz.analytical.repository.user
 
 import androidx.compose.runtime.mutableStateOf
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.auth.User
+import com.google.firebase.firestore.toObjects
 import com.google.firebase.storage.FirebaseStorage
 import com.ketchupzzz.analytical.models.SchoolLevel
 import com.ketchupzzz.analytical.models.Students
+import com.ketchupzzz.analytical.models.StudentsWithSubmissions
 import com.ketchupzzz.analytical.utils.UiState
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.tasks.await
 
 
 class StudentRepositoryImpl(
@@ -163,10 +169,79 @@ class StudentRepositoryImpl(
             }
     }
 
-    override fun logout(result: (UiState<String>) -> Unit) {
+    override suspend  fun logout(result: (UiState<String>) -> Unit) {
         result.invoke(UiState.Loading)
         auth.signOut()
+        delay(1000)
+        setStudent(null)
         result.invoke(UiState.Success("Logged out successfully"))
+    }
+
+    override suspend fun changePassword(
+        oldPassword: String,
+        newPassword: String,
+        result: (UiState<String>) -> Unit
+    ) {
+        try {
+            result.invoke(UiState.Loading)
+            val currentUser = auth.currentUser
+
+            if (currentUser != null) {
+                val credential = EmailAuthProvider.getCredential(currentUser.email!!, oldPassword)
+                currentUser.reauthenticate(credential).await()
+                currentUser.updatePassword(newPassword).await()
+
+                result.invoke(UiState.Success("Password updated successfully."))
+            } else {
+
+                result.invoke(UiState.Error("User is not logged in."))
+            }
+        } catch (e: FirebaseAuthInvalidCredentialsException) {
+
+            result.invoke(UiState.Error("Old password is incorrect."))
+        } catch (e: Exception) {
+            result.invoke(UiState.Error(e.message.toString()))
+        }
+    }
+
+    override suspend fun editProfile(
+        id : String,
+        firstName: String,
+        middleName: String,
+        lastName: String,
+        result: (UiState<String>) -> Unit
+    ) {
+       // fname,mname.lname
+
+        firestore
+            .collection(STUDENTS_COLLECTION)
+            .document(id)
+            .update(
+                "fname",firstName,
+                "mname",middleName,
+                "lname",lastName
+            ).addOnCompleteListener {
+                if (it.isSuccessful) {
+                    result.invoke(UiState.Success("Successfully Updated!"))
+                } else {
+                    result.invoke(UiState.Error("Unknown error"))
+                }
+            }.addOnFailureListener {
+                result.invoke(UiState.Error(it.message.toString()))
+            }
+
+    }
+
+    override suspend fun getStudents(result: (UiState<List<Students>>) -> Unit) {
+
+        firestore.collection(
+            STUDENTS_COLLECTION
+        ).addSnapshotListener { value, error ->
+            value?.let {
+                val students = it.toObjects(Students::class.java)
+                result.invoke(UiState.Success(students))
+            }
+        }
     }
 
 

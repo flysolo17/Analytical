@@ -55,10 +55,11 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.ketchupzzz.analytical.R
 import com.ketchupzzz.analytical.models.SchoolLevel
-import com.ketchupzzz.analytical.presentation.navigation.Root
+import com.ketchupzzz.analytical.presentation.navigation.AppRouter
 import com.ketchupzzz.analytical.ui.custom.primaryTextFieldColors
 import com.ketchupzzz.analytical.utils.UiState
 import kotlinx.coroutines.Dispatchers
@@ -72,7 +73,9 @@ fun RegisterScreen(
     navHostController: NavHostController,
     modifier: Modifier = Modifier,
     state: RegisterState,
-    onAction: (RegistrationEvents) -> Unit) {
+    events: (RegistrationEvents) -> Unit
+) {
+
     val onBoardingState = rememberPagerState(0,0F) {
         3
     }
@@ -108,7 +111,7 @@ fun RegisterScreen(
                     onNext = {
                         when (onBoardingState.currentPage) {
                             0 -> {
-                                onAction(RegistrationEvents.CheckStudentID {
+                                events(RegistrationEvents.CheckStudentID {
                                     when (it) {
                                         is UiState.Error -> {
                                             Toast.makeText(context, it.message, Toast.LENGTH_SHORT)
@@ -138,7 +141,7 @@ fun RegisterScreen(
                                 }
                             }
                             2 -> {
-                                onAction(RegistrationEvents.OnSubmit{
+                                events(RegistrationEvents.OnSubmit{
                                     when(it) {
                                         is UiState.Error -> {
                                             Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
@@ -146,7 +149,7 @@ fun RegisterScreen(
                                         is UiState.Loading -> {}
                                         is UiState.Success -> {
                                             Toast.makeText(context, it.data, Toast.LENGTH_SHORT).show()
-                                            navHostController.navigate(Root.route)
+                                            navHostController.navigate(AppRouter.MainRoutes.route)
                                         }
                                     }
                                 })
@@ -166,15 +169,15 @@ fun RegisterScreen(
                 when(page) {
                     0 -> StudentRegistrationForm(
                         state = state,
-                        onAction = onAction
+                        onAction = events
                     )
                     1 -> StudentInformationForm(
                         state = state,
-                        onAction = onAction
+                        onAction = events
                     )
                     2 -> StudentAuthenticationForm(
                         state = state,
-                        onAction = onAction
+                        onAction = events
                     )
                 }
             }
@@ -333,7 +336,9 @@ fun StudentInformationForm(modifier: Modifier = Modifier,state: RegisterState,on
                 onValueChange = { onAction(RegistrationEvents.OnSchoolLevelChanged(state.schoolLevel)) },
                 label = { Text("School level") },
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                modifier = Modifier.fillMaxWidth().menuAnchor()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .menuAnchor()
             )
 
             ExposedDropdownMenu(

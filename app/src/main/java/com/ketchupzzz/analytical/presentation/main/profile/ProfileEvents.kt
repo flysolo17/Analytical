@@ -1,10 +1,10 @@
 package com.ketchupzzz.analytical.presentation.main.profile
 
-import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.ViewModel
-import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
+import androidx.navigation.NavHostController
 
-sealed class ProfileEvents {
-    object OnLoggedOut : ProfileEvents()
+
+sealed interface ProfileEvents  {
+        data class OnLoggedOut(val navHostController: NavHostController) : ProfileEvents
+
+        data class OnGetSubmissions(val sid : String) : ProfileEvents
 }

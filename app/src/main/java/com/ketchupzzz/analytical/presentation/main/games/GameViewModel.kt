@@ -39,7 +39,7 @@ class GameViewModel @Inject constructor(
                         isLoading = false,
                         errors = null,
                         quiz = it.data.quiz,
-                        levels = it.data.levels,
+                        levels = it.data.levels.sortedBy { it.levelNumber },
                         submissions = it.data.submissions
                     )
                 }

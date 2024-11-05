@@ -31,6 +31,8 @@ object AppModule {
     ) : StudentRepository {
         return  StudentRepositoryImpl(firebaseAuth,firestore,storage)
     }
+
+
     @Provides
     @Singleton
     fun provideQuizRepository(

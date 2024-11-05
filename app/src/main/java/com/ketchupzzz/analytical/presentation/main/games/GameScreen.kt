@@ -103,6 +103,7 @@ fun GameDataScreen(
                         )
                     )
                 }
+                levelsWithSubmissions.sortedBy { it.levels.levelNumber }
                 when(page) {
                     0 -> LevelsPage(
                         quiz= quiz!!,

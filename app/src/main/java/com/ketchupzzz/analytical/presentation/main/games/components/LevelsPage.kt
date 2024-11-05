@@ -1,6 +1,7 @@
 package com.ketchupzzz.analytical.presentation.main.games.components
 
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -41,8 +43,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ketchupzzz.analytical.models.Category
@@ -56,6 +60,7 @@ import com.ketchupzzz.analytical.presentation.navigation.AppRouter
 import com.ketchupzzz.analytical.ui.custom.PrimaryButton
 import com.ketchupzzz.analytical.utils.RatingBar
 import com.ketchupzzz.analytical.utils.getCurrentLevel
+import com.ketchupzzz.analytical.utils.getHexBackground
 import com.ketchupzzz.analytical.utils.getNextLevel
 import kotlinx.coroutines.launch
 
@@ -72,25 +77,36 @@ fun LevelsPage(
 
     val currentLevel = levels.getCurrentLevel()
 
-    Column(modifier = modifier.fillMaxSize()) {
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(3),
-            contentPadding = PaddingValues(4.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(3),
+        contentPadding = PaddingValues(4.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        item(
+            span = { GridItemSpan(3) }
+        ) {
+            Box(
+                modifier = modifier.fillMaxWidth().padding(16.dp),
+                contentAlignment = Alignment.Center
             ) {
-            items(items = levels, key = {it.levels.id }) {
-                val myLevel: Int = it.levels.name.last().digitToInt()
-                LevelItems(
-                    quiz = quiz,
-                    levelsWithSubmissions =it,
-                    state = state,
-                    nextLevel = levels.getNextLevel(myLevel),
-                    e = e,
-                    navHostController = navHostController,
-                    currentLevel = currentLevel
+                Text(
+                    text = "Levels",
+                    style = MaterialTheme.typography.titleLarge
                 )
             }
+        }
+        items(items = levels, key = {it.levels.id }) {
+            val myLevel: Int = it.levels.name.last().digitToInt()
+            LevelItems(
+                quiz = quiz,
+                levelsWithSubmissions =it,
+                state = state,
+                nextLevel = levels.getNextLevel(myLevel),
+                e = e,
+                navHostController = navHostController,
+                currentLevel = currentLevel
+            )
         }
     }
 }
@@ -136,69 +152,69 @@ fun LevelItems(
             }
         )
     }
-    OutlinedCard(
-        modifier = modifier
+//    if (myLevel  <= currentLevel) {
+//        showBottomSheet = true
+//    }
+
+    Column(
+        modifier = Modifier
             .fillMaxWidth()
-            .padding(4.dp)
-            .clickable {
-                if (myLevel  <= currentLevel) {
-                    showBottomSheet = true
-                }
+            .clickable(enabled = myLevel <= currentLevel) {  // Disable click if myLevel > currentLevel
+                showBottomSheet = true
             }
+            .then(
+                if (myLevel > currentLevel) {
+                    Modifier.alpha(0.5f)
+                } else Modifier
+            ),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
             contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    if (myLevel > currentLevel)
-                        Color.Black.copy(alpha = 0.3f)
-                    else MaterialTheme.colorScheme.surface
-                )
+            modifier = modifier.fillMaxSize()
         ) {
+            Image(
+                painter = painterResource(levels.levelNumber.getHexBackground()),
+                modifier = modifier.size(120.dp),
+                contentDescription = "Item card"
+            )
             Column(
-                verticalArrangement = Arrangement.Center,
+                modifier = modifier.padding(4.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
+                verticalArrangement = Arrangement.Center
+            ){
                 Text(
-                    text = "${levels.name.last()}",
+                    text = "${levels.levelNumber}",
                     style = MaterialTheme.typography.titleLarge
                 )
                 Text(
-                    text = levels.name.dropLast(2),
+                    text = "Level",
                     style = MaterialTheme.typography.titleSmall
                 )
-                Spacer(modifier = modifier.height(4.dp))
-
-                val rating: Double = if (levelsWithSubmissions.submissions.isNotEmpty()) {
-                    levelsWithSubmissions.submissions.sortedByDescending { it.performance.earning }[0].performance.earning
-                } else {
-                    0.00
-                }
-
-                RatingBar(
-                    rating = rating,
-                    onRatingChanged = {  },
-                    starSize = 16.dp,
-                    stars = 3,
-                    maxRating = (levels.points * levels.questions).toDouble()
-                )
             }
 
-            if (myLevel > currentLevel) {
-                Icon(
-                    imageVector = Icons.Rounded.Lock,
-                    contentDescription = "Lock",
-                    tint = Color.White,
-                    modifier = modifier.size(48.dp)
-                )
-            }
         }
+        Spacer(
+            modifier = modifier.height(4.dp)
+        )
+        val rating: Double = if (levelsWithSubmissions.submissions.isNotEmpty()) {
+            levelsWithSubmissions.submissions.sortedByDescending { it.performance.earning }[0].performance.earning
+        } else {
+            0.00
+        }
+        RatingBar(
+            rating = rating,
+            onRatingChanged = {  },
+            starSize = 16.dp,
+            stars = 3,
+            maxRating = (levels.points * levels.questions).toDouble()
+        )
     }
 }
+
+
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

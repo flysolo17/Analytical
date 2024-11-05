@@ -2,10 +2,13 @@ package com.ketchupzzz.analytical.utils
 
 import android.content.Context
 import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import com.ketchupzzz.analytical.R
 import com.ketchupzzz.analytical.models.Students
 import com.ketchupzzz.analytical.models.quiz.Levels
 import com.ketchupzzz.analytical.models.submissions.AnswerSheet
@@ -118,5 +121,21 @@ fun String.displayCategory(): String {
         "WORD_PUZZLE" -> "Word Puzzle"
         "MATH_LOGIC_PUZZLE" -> "Math Logic Puzzle"
         else -> "Unknown Category"
+    }
+}
+
+fun Int.getHexBackground(): Int {
+    return when ((this - 1) % 10 + 1) {
+        1 -> R.drawable.hex_1
+        2 -> R.drawable.hex_2
+        3 -> R.drawable.hex_3
+        4 -> R.drawable.hex_4
+        5 -> R.drawable.hex_5
+        6 -> R.drawable.hex_6
+        7 -> R.drawable.hex_7
+        8 -> R.drawable.hex_8
+        9 -> R.drawable.hex_9
+        10 -> R.drawable.hex_10
+        else -> R.drawable.hex_1
     }
 }

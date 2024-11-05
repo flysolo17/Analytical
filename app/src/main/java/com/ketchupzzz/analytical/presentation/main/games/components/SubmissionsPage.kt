@@ -88,10 +88,7 @@ fun SubmissionCard(
     val level = submissions.levels
     val submission = submissions.submissions.getOrNull(0)
     Card(
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-            contentColor = MaterialTheme.colorScheme.onSurface
-        ),
+
         elevation = CardDefaults.cardElevation(0.dp),
         shape = RoundedCornerShape(4.dp),
         modifier = modifier

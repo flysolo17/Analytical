@@ -4,6 +4,8 @@ import com.ketchupzzz.analytical.utils.Password
 import com.ketchupzzz.analytical.utils.StudentID
 
 
+
+
 data class LoginState(
     val studentID : StudentID = StudentID(),
     val password : Password = Password(),
@@ -11,9 +13,7 @@ data class LoginState(
     val isLoading : Boolean = false,
     val error : String? = null,
     val isLoggedIn : Boolean = false,
-) {
-
-}
+)
 
 
 

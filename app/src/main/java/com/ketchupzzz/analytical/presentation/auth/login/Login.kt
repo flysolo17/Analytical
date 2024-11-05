@@ -58,7 +58,6 @@ fun LoginScreen(
     state : LoginState,
     events: (LoginEvents) -> Unit
 ) {
-
     LaunchedEffect(state.isLoggedIn) {
         if (state.isLoggedIn) {
             navHostController.navigate(AppRouter.MainRoutes.route) {
@@ -202,8 +201,6 @@ fun LoginForm(modifier: Modifier = Modifier,navHostController: NavHostController
             ){
                 Text(text = stringResource(R.string.login),fontWeight = FontWeight.Bold)
             }
-
-
             TextButton(onClick = {
                 onRegister()
             }) {

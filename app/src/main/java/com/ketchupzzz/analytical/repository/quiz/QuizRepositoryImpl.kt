@@ -57,6 +57,7 @@ class QuizRepositoryImpl(private val firestore : FirebaseFirestore): QuizReposit
             val levelsSnapshot = firestore.collection(QUIZ_COLLECTION)
                 .document(id)
                 .collection(LEVELS_COLLECTION)
+                .orderBy("levelNumber",Query.Direction.ASCENDING)
                 .get().await()
             val submissions = firestore.collection(SubmissionRepositoryImpl.SUBMISSIONS_COLLECTION)
                 .whereEqualTo("quizInfo.id",id)
@@ -65,7 +66,7 @@ class QuizRepositoryImpl(private val firestore : FirebaseFirestore): QuizReposit
 
             val quiz = QuizWithLevels(
                 quiz = quizSnapshot.toObject(Quiz::class.java),
-                levels = levelsSnapshot.toObjects(Levels::class.java),
+                levels = levelsSnapshot.toObjects(Levels::class.java).sortedBy { it.levelNumber },
                 submissions = submissions.toObjects(Submissions::class.java)
             )
             result.invoke(UiState.Success(quiz))

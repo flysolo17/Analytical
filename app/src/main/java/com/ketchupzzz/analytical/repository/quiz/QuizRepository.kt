@@ -4,6 +4,7 @@ import androidx.compose.runtime.MutableState
 import com.ketchupzzz.analytical.models.SchoolLevel
 import com.ketchupzzz.analytical.models.quiz.CategoryWithQuiz
 import com.ketchupzzz.analytical.models.quiz.Quiz
+import com.ketchupzzz.analytical.models.submissions.RecentlyPlayed
 import com.ketchupzzz.analytical.presentation.main.games.data.QuizWithLevels
 import com.ketchupzzz.analytical.utils.UiState
 
@@ -23,4 +24,7 @@ interface QuizRepository {
       category : String,
       result: (UiState<List<Quiz>>) -> Unit
    )
+
+
+   suspend fun getRecentlyPlayedGame(userID : String,result: (UiState<RecentlyPlayed?>) -> Unit)
 }

@@ -31,6 +31,19 @@ class DashboardViewmodel @Inject constructor(
         when(e) {
             DashboardEvents.OnGetAllQuizies -> getAllQuiz()
             is DashboardEvents.OnSelect -> state = state.copy(selected = e.index)
+            is DashboardEvents.OnGetRecentlyPlayed -> getRecentlyPlayedGame(e.userID)
+        }
+    }
+
+    private fun getRecentlyPlayedGame(userID: String) {
+        viewModelScope.launch {
+            quizRepository.getRecentlyPlayedGame(userID) {
+                if (it is UiState.Success) {
+                    state = state.copy(
+                        recentlyPlayed = it.data
+                    )
+                }
+            }
         }
     }
 

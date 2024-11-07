@@ -72,6 +72,7 @@ import com.ketchupzzz.analytical.models.Category
 import com.ketchupzzz.analytical.models.quiz.CategoryWithQuiz
 import com.ketchupzzz.analytical.models.quiz.Quiz
 import com.ketchupzzz.analytical.presentation.main.dashboard.components.DashboardHeader
+import com.ketchupzzz.analytical.presentation.main.dashboard.components.RecentlyPlayed
 import com.ketchupzzz.analytical.presentation.main.dashboard.components.setColor
 import com.ketchupzzz.analytical.presentation.navigation.AppRouter
 import com.ketchupzzz.analytical.ui.custom.CircularImageWithStroke
@@ -92,7 +93,13 @@ fun DashboardScreen(
     state: DashboardState,
     events: (DashboardEvents) -> Unit
 ) {
-
+    LaunchedEffect(
+        state
+    ) {
+        if (state.students != null) {
+            events.invoke(DashboardEvents.OnGetRecentlyPlayed(state.students.id!!))
+        }
+    }
     when {
         state.isLoading -> ProgressBar(title="Getting all games..")
         state.quizzes.isEmpty() -> UnknownError(title = "No Games Yet")
@@ -107,6 +114,7 @@ fun DashboardScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+
                 item(span = { GridItemSpan(2) }) {
                     OutlinedButton(onClick = { navHostController.navigate(AppRouter.Search.navigate(state.students?.schoolLevel?.name ?: "JHS")) }) {
                         Row(
@@ -133,6 +141,11 @@ fun DashboardScreen(
                         fontWeight = FontWeight.Black,
                         modifier = modifier.padding(8.dp)
                     )
+                }
+                if (state.recentlyPlayed != null) {
+                    item(span = { GridItemSpan(2) }) {
+                        RecentlyPlayed(recentlyPlayed = state.recentlyPlayed)
+                    }
                 }
                 items(categories) {
                     CategoryItem(category = it, imageRes = it.displayImage() , onClick = {

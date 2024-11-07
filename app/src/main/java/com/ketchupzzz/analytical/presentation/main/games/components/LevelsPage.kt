@@ -59,8 +59,9 @@ import com.ketchupzzz.analytical.presentation.main.games.data.QuizAndLevel
 import com.ketchupzzz.analytical.presentation.navigation.AppRouter
 import com.ketchupzzz.analytical.ui.custom.PrimaryButton
 import com.ketchupzzz.analytical.utils.RatingBar
-import com.ketchupzzz.analytical.utils.getCurrentLevel
+
 import com.ketchupzzz.analytical.utils.getHexBackground
+import com.ketchupzzz.analytical.utils.getMyCurrentLevel
 import com.ketchupzzz.analytical.utils.getNextLevel
 import kotlinx.coroutines.launch
 
@@ -74,8 +75,10 @@ fun LevelsPage(
     e: (GameEvents) -> Unit,
     navHostController: NavHostController
 ) {
-
-    val currentLevel = levels.getCurrentLevel()
+   val newLevels =  levels.sortedBy {
+        it.levels.levelNumber
+    }
+    val currentLevel = newLevels.getMyCurrentLevel()
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(3),
@@ -96,16 +99,15 @@ fun LevelsPage(
                 )
             }
         }
-        items(items = levels, key = {it.levels.id }) {
-            val myLevel: Int = it.levels.name.last().digitToInt()
+        items(items = newLevels, key = {it.levels.id }) {
+            val myLevel: Int = it.levels.levelNumber
             LevelItems(
                 quiz = quiz,
                 levelsWithSubmissions =it,
                 state = state,
-                nextLevel = levels.getNextLevel(myLevel),
                 e = e,
                 navHostController = navHostController,
-                currentLevel = currentLevel
+                isVisible = myLevel <= currentLevel
             )
         }
     }
@@ -116,9 +118,8 @@ fun LevelsPage(
 fun LevelItems(
     quiz: Quiz,
     levelsWithSubmissions: LevelsWithSubmissions,
-    nextLevel : Levels ? = null,
     modifier: Modifier = Modifier,
-    currentLevel: Int = 1,
+    isVisible: Boolean,
     state: GameState,
     e : (GameEvents) -> Unit,
     navHostController: NavHostController
@@ -146,7 +147,7 @@ fun LevelItems(
             e =e ,
             onStart = {
                 navHostController.navigate(AppRouter.GamingScreen.createRoute(
-                    QuizAndLevel(quiz = quiz, level = levels , nextLevels = nextLevel)
+                    QuizAndLevel(quiz = quiz, level = levels)
                 ))
                 showBottomSheet = false
             }
@@ -159,11 +160,11 @@ fun LevelItems(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(enabled = myLevel <= currentLevel) {  // Disable click if myLevel > currentLevel
+            .clickable(enabled = isVisible) {  // Disable click if myLevel > currentLevel
                 showBottomSheet = true
             }
             .then(
-                if (myLevel > currentLevel) {
+                if (!isVisible) {
                     Modifier.alpha(0.5f)
                 } else Modifier
             ),

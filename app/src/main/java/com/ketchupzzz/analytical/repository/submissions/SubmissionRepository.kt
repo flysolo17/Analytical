@@ -5,8 +5,8 @@ import com.ketchupzzz.analytical.presentation.main.games.data.LevelsWithSubmissi
 import com.ketchupzzz.analytical.utils.UiState
 
 
-interface SubmissionRepository {
 
+interface SubmissionRepository {
     fun submitQuiz(submission: Submissions, result : (UiState<String>) -> Unit)
 
     suspend fun getAllSubmissions(id : String,result: (UiState<List<Submissions>>) -> Unit)

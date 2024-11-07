@@ -3,6 +3,7 @@ package com.ketchupzzz.analytical.utils
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.Drawable
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.Dp
@@ -17,6 +18,15 @@ import com.ketchupzzz.analytical.presentation.main.games.data.LevelsWithSubmissi
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlin.random.Random
+
+
+fun generateRandomString(size: Int = 10): String {
+    val data : String = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    return (1..size)
+        .map { data[Random.nextInt(data.length)] }
+        .joinToString("")
+}
 
 
 fun Int.getEndMinute() : String {
@@ -82,18 +92,10 @@ fun Double.getScoreMessage(): String {
     }
 }
 
-fun List<LevelsWithSubmissions>.getCurrentLevel() : Int{
-    var level = 1
-    this.forEach {
-        if (it.submissions.isNotEmpty()) {
-            level+=1
-        }
-    }
-    return level
+fun List<LevelsWithSubmissions>.getMyCurrentLevel(): Int {
+    // Return the 1-based index of the first level without submissions
+    return this.indexOfFirst { it.submissions.isEmpty() } + 1
 }
-
-
-
 
 fun List<Submissions>.groupByLevels() {
 
@@ -138,4 +140,11 @@ fun Int.getHexBackground(): Int {
         10 -> R.drawable.hex_10
         else -> R.drawable.hex_1
     }
+}
+
+
+fun String.createLog(
+    message: String
+) {
+    Log.d(this,message)
 }

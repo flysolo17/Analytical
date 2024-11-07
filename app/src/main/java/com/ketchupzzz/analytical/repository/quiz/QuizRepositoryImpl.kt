@@ -5,17 +5,23 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.google.firebase.FirebaseError
+import com.google.firebase.FirebaseException
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.toObject
 import com.ketchupzzz.analytical.models.Category
 import com.ketchupzzz.analytical.models.SchoolLevel
+import com.ketchupzzz.analytical.models.Students
 import com.ketchupzzz.analytical.models.quiz.CategoryWithQuiz
 import com.ketchupzzz.analytical.models.quiz.Levels
 import com.ketchupzzz.analytical.models.quiz.Quiz
+import com.ketchupzzz.analytical.models.submissions.RecentlyPlayed
 import com.ketchupzzz.analytical.models.submissions.Submissions
 import com.ketchupzzz.analytical.presentation.main.games.data.QuizWithLevels
 import com.ketchupzzz.analytical.repository.submissions.SubmissionRepositoryImpl
 import com.ketchupzzz.analytical.utils.UiState
+import com.ketchupzzz.analytical.utils.createLog
 import kotlinx.coroutines.tasks.await
 
 
@@ -107,6 +113,64 @@ class QuizRepositoryImpl(private val firestore : FirebaseFirestore): QuizReposit
                 }
             }
     }
+
+
+    override suspend fun getRecentlyPlayedGame(
+        userID: String,
+        result: (UiState<RecentlyPlayed?>) -> Unit
+    ) {
+        try {
+            val recentSubmission = firestore.collection("submissions")
+                .whereEqualTo("studentID", userID)
+                .orderBy("createdAt", Query.Direction.DESCENDING)
+                .limit(1)
+                .get()
+                .await()
+                .toObjects(Submissions::class.java)
+
+            QUIZ_COLLECTION.createLog(recentSubmission.toString())
+            if (recentSubmission.isEmpty()) {
+                result(UiState.Success(null))
+                return
+            }
+
+
+            val recentGame = recentSubmission.first()
+
+
+            val gameData = firestore.collection(QUIZ_COLLECTION)
+                .document(recentGame.id!!)
+                .get()
+                .await()
+                .toObject(Quiz::class.java)
+            QUIZ_COLLECTION.createLog(gameData.toString())
+            if (gameData == null) {
+                result(UiState.Success(null))
+                return
+            }
+
+
+            val recentlyPlayed = RecentlyPlayed(
+                name = gameData.title,
+                type = gameData.category,
+                subject = gameData.subject,
+                image = gameData.cover_photo,
+                maxLevel = gameData.levels,
+                currentLevel = recentGame.quizInfo?.levels?.levelNumber,
+                gameDate = gameData.createdAt
+            )
+            QUIZ_COLLECTION.createLog(recentlyPlayed.toString())
+            result(UiState.Success(recentlyPlayed))
+
+        } catch (e: FirebaseException) {
+            QUIZ_COLLECTION.createLog(e.message.toString())
+            result(UiState.Error("Firebase error: ${e.message}"))
+        } catch (e: Exception) {
+            QUIZ_COLLECTION.createLog(e.message.toString())
+            result(UiState.Error("An error occurred: ${e.message}"))
+        }
+    }
+
 
     companion object {
         const val QUIZ_COLLECTION = "quiz"

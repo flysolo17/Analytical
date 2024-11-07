@@ -3,13 +3,19 @@ package com.ketchupzzz.analytical.repository.submissions
 import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.ketchupzzz.analytical.models.games.GamesHistory
 import com.ketchupzzz.analytical.models.submissions.GroupedSubmissions
 import com.ketchupzzz.analytical.models.submissions.Submissions
 import com.ketchupzzz.analytical.presentation.main.games.data.LevelsWithSubmissions
 import com.ketchupzzz.analytical.utils.UiState
+import com.ketchupzzz.analytical.utils.generateRandomString
 
+const val GAME_COLLECTION = "recentlyPlayed"
 class SubmissionRepositoryImpl(private val firestore: FirebaseFirestore): SubmissionRepository {
+
+
     override fun submitQuiz(submission: Submissions, result: (UiState<String>) -> Unit) {
+        val  batch = firestore.batch()
         submission.id = firestore.collection(SUBMISSIONS_COLLECTION).document().id
         result.invoke(UiState.Loading)
         firestore.collection(SUBMISSIONS_COLLECTION)

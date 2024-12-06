@@ -69,6 +69,7 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.ketchupzzz.analytical.R
 import com.ketchupzzz.analytical.models.Category
+import com.ketchupzzz.analytical.models.displayName
 import com.ketchupzzz.analytical.models.quiz.CategoryWithQuiz
 import com.ketchupzzz.analytical.models.quiz.Quiz
 import com.ketchupzzz.analytical.presentation.main.dashboard.components.DashboardHeader
@@ -81,6 +82,8 @@ import com.ketchupzzz.analytical.ui.theme.AnalyticalTheme
 import com.ketchupzzz.analytical.utils.Profile
 import com.ketchupzzz.analytical.utils.ProgressBar
 import com.ketchupzzz.analytical.utils.UnknownError
+import com.ketchupzzz.analytical.utils.displayCategory
+import com.ketchupzzz.analytical.utils.toast
 import kotlinx.coroutines.launch
 
 
@@ -93,11 +96,12 @@ fun DashboardScreen(
     state: DashboardState,
     events: (DashboardEvents) -> Unit
 ) {
+    val context = LocalContext.current
     LaunchedEffect(
         state
     ) {
         if (state.students != null) {
-            events.invoke(DashboardEvents.OnGetRecentlyPlayed(state.students.id!!))
+            events.invoke(DashboardEvents.OnGetStudentSubmission(state.students.id!!))
         }
     }
     when {
@@ -110,27 +114,26 @@ fun DashboardScreen(
                 columns = GridCells.Fixed(2),
                 modifier = modifier
                     .fillMaxSize()
-                        .padding(8.dp),
+                    .padding(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-
                 item(span = { GridItemSpan(2) }) {
-                    OutlinedButton(onClick = { navHostController.navigate(AppRouter.Search.navigate(state.students?.schoolLevel?.name ?: "JHS")) }) {
-                        Row(
-                            modifier = modifier
-                                .fillMaxWidth()
-                                .padding(4.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(text = "Search games here..")
-                            Icon(imageVector = Icons.Rounded.Search, contentDescription = "Search")
-                        }
-
-                    }
-              
+                    DashboardHeader(
+                        students = state.students,
+                        submissions = state.submissions,
+                        onSearch  ={ navHostController.navigate(AppRouter.Search.route)}
+                    )
                 }
+//                if (state.submissions.isNotEmpty()) {
+//                    val submission = state.submissions.firstOrNull()
+//                    val game = state.quizzes.filter { quiz ->
+//                        quiz.quiz.firstOrNull { it.id == submission?.quizInfo?.id }
+//                    }
+//                    val submissions  = state.submissions.filter { it.quizInfo?.id == game.quiz }
+//                    item(span = { GridItemSpan(2) }) {
+//                    }
+//                }
                 val categories = Category.entries.toList()
                 item(
                     span = {GridItemSpan(2)}
@@ -142,11 +145,7 @@ fun DashboardScreen(
                         modifier = modifier.padding(8.dp)
                     )
                 }
-                if (state.recentlyPlayed != null) {
-                    item(span = { GridItemSpan(2) }) {
-                        RecentlyPlayed(recentlyPlayed = state.recentlyPlayed)
-                    }
-                }
+
                 items(categories) {
                     CategoryItem(category = it, imageRes = it.displayImage() , onClick = {
                         navHostController.navigate(AppRouter.Category.navigate(
@@ -221,7 +220,7 @@ fun CategoryItem(
             }
 
             Text(
-                text = category.name.replace("_"," "),
+                text = category.displayName(),
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Bold
             )
@@ -232,10 +231,10 @@ fun CategoryItem(
 
 fun Category.displayImage() : Int {
     return when(this) {
-        Category.REBUS_PUZZLE -> R.drawable.rebus
-        Category.RIDDLES -> R.drawable.riddles
-        Category.WORD_PUZZLE -> R.drawable.word_puzzle
-        Category.MATH_LOGIC_PUZZLE -> R.drawable.math
+        Category.QUIZ_GAME -> R.drawable.rebus
+        Category.PUZZLE_GAME -> R.drawable.riddles
+        Category.MEMORY_GAME -> R.drawable.word_puzzle
+        Category.MATH_GAME -> R.drawable.math
     }
 }
 

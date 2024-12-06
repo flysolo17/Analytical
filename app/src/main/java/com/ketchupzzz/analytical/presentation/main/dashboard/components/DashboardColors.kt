@@ -13,9 +13,9 @@ val LightYellow = Color(0xFFFFD66B)
 
 fun Category.setColor() : Color {
     return when(this) {
-        Category.REBUS_PUZZLE -> LightBlue
-        Category.RIDDLES -> LightTeal
-        Category.WORD_PUZZLE -> LightPink
-        Category.MATH_LOGIC_PUZZLE -> LightYellow
+        Category.QUIZ_GAME -> LightBlue
+        Category.PUZZLE_GAME -> LightTeal
+        Category.MEMORY_GAME -> LightPink
+        Category.MATH_GAME -> LightYellow
     }
 }

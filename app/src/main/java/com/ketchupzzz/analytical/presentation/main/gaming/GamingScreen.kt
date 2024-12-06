@@ -176,7 +176,9 @@ fun GamingScreen(
                 navHostController.popBackStack()
             })
     }
-    BackpressHandler(navHostController = navHostController, e = e)
+    BackpressHandler(navHostController = navHostController, onBackPress = {
+        e(GamingEvents.OnExitGame(navHostController))
+    })
     Scaffold(
         containerColor = MaterialTheme.colorScheme.primary,
         contentColor = MaterialTheme.colorScheme.onPrimary,
@@ -268,6 +270,7 @@ fun QuestionScreen(
         mutableStateOf("")
     }
 
+    val scope = rememberCoroutineScope()
     LaunchedEffect(answer) {
         if (answer.trim() == question.answer?.trim()) {
             onNext(answer)
@@ -284,6 +287,9 @@ fun QuestionScreen(
         QuestionHeader(
             question = question,
             answer = answer,
+        )
+        Spacer(
+            modifier = modifier.height(16.dp)
         )
         if (question.choices.isEmpty()) {
             Column(
@@ -311,7 +317,6 @@ fun QuestionScreen(
                         Icon(imageVector =     Icons.Default.Replay, contentDescription = "reset")
                     }
                 }
-
                 ChoicesGrid(
                     text = shuffledString ?:"",
                     selectedIndexes = state.answerIndex,
@@ -335,7 +340,11 @@ fun QuestionScreen(
                 question = question,
                 onNext = { s ->
                     answer = s
-                    onNext(answer)
+                    scope.launch {
+                        delay(1000)
+                        onNext(answer)
+                    }
+
                 }
             )
         }
@@ -356,9 +365,9 @@ private fun QuestionScreenPrev() {
             id = "FE0FkyGHrmIBzYai6RVl",
             answer = "cry",
             image = "https://firebasestorage.googleapis.com/v0/b/analytical-8e3db.appspot.com/o/quiz%2Fquestions%2F4fcdd243-af0a-4939-9253-cdbf0bdd1bef?alt=media&token=05465ebd-9d35-499b-831f-8f41757e47a1",
-            question = "scrub : wash :: sob : ______",
+            question = "",
             choices = listOf("Answer 1","Answer 2","Answer 3" ,"Answer 4"),
-            type = Category.WORD_PUZZLE,
+            type = Category.PUZZLE_GAME,
             hint = "A sob is an intense form of this action, just like scrubbing is a thorough form of washing.",
         )
         QuestionScreen(question = question, state = GamingState(), events = {}) {
@@ -434,7 +443,7 @@ fun GamingTopBar(
 @Composable
 fun BackpressHandler(
     navHostController: NavHostController,
-    e: (GamingEvents) -> Unit
+    onBackPress : () -> Unit
 ) {
     var showDialog by remember { mutableStateOf(false) }
     var backPressCount by remember { mutableIntStateOf(0) }
@@ -459,7 +468,7 @@ fun BackpressHandler(
         ExitDialog(
             onConfirm = {
                 showDialog = false
-                e(GamingEvents.OnExitGame(navHostController))
+                onBackPress()
             },
             onDismiss = { showDialog = false }
         )

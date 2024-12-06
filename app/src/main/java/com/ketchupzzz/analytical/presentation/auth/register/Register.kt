@@ -332,7 +332,7 @@ fun StudentInformationForm(modifier: Modifier = Modifier,state: RegisterState,on
         }) {
             TextField(
                 readOnly = true,
-                value = state.schoolLevel.name,
+                value = state.schoolLevel.displayName,
                 onValueChange = { onAction(RegistrationEvents.OnSchoolLevelChanged(state.schoolLevel)) },
                 label = { Text("School level") },
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
@@ -348,7 +348,7 @@ fun StudentInformationForm(modifier: Modifier = Modifier,state: RegisterState,on
             ) {
                 schoolLevels.forEach { schoolLevel ->
                     DropdownMenuItem(
-                        text = { Text(schoolLevel.name) },
+                        text = { Text(schoolLevel.displayName) },
                         onClick = {
                             onAction(RegistrationEvents.OnSchoolLevelChanged(schoolLevel))
                             expanded = false

@@ -10,6 +10,7 @@ import com.ketchupzzz.analytical.repository.submissions.SubmissionRepository
 import com.ketchupzzz.analytical.repository.user.StudentRepository
 import com.ketchupzzz.analytical.utils.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,7 +24,7 @@ class LeaderBoardViewModel @Inject constructor(
 
     init {
         events(LeaderboardEvents.OnGetStudents)
-        events(LeaderboardEvents.OnGetSubmissions)
+
     }
     fun events(e: LeaderboardEvents) {
         when (e) {
@@ -35,25 +36,51 @@ class LeaderBoardViewModel @Inject constructor(
     private fun getSubmissions() {
         viewModelScope.launch {
             submissionRepository.getAllSubmissions { result ->
-                if (result is UiState.Success) {
-                    state = state.copy(
+                when(result) {
+                    is UiState.Error -> state = state.copy(
+                        isLoading = false,
+                        errors = result.message
+                    )
+                    UiState.Loading -> state  = state.copy(
+                        isLoading = true,
+                        errors = null
+                    )
+                    is UiState.Success -> state = state.copy(
+                        isLoading = false,
+                        errors = null,
                         submissions = result.data,
                         leaderboard = state.students.displayLeaderBoard(result.data)
                     )
                 }
+
             }
         }
     }
 
     private fun getStudents() {
         viewModelScope.launch {
+
             studentRepository.getStudents { result ->
-                if (result is UiState.Success) {
-                    state = state.copy(
-                        students = result.data,
-                        leaderboard = result.data.displayLeaderBoard(state.submissions)
+                state = when(result) {
+                    is UiState.Error ->state.copy(
+                        isLoading = true,
+                        errors = result.message
                     )
+                    UiState.Loading -> state.copy(
+                        isLoading = true,
+                        errors = null
+                    )
+                    is UiState.Success -> {
+
+                        events(LeaderboardEvents.OnGetSubmissions)
+                        state.copy(
+                            isLoading = false,
+                            errors = null,
+                            students = result.data
+                        )
+                    }
                 }
+
             }
         }
     }

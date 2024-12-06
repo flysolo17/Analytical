@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -71,20 +72,14 @@ fun LoginScreen(
 
     Surface(modifier = modifier.fillMaxSize()) {
         Column(modifier = modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Bottom, horizontalAlignment = Alignment.CenterHorizontally) {
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             Image(
-                painter = painterResource(id = R.drawable.login_bg),
+                painter = painterResource(id = R.drawable.logo),
                 contentDescription = "Login BG",
-                contentScale = ContentScale.Crop,
                 modifier = modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .clip(
-                        shape = RoundedCornerShape(
-                            bottomStart = 16.dp,
-                            bottomEnd = 16.dp
-                        )
-                    )
+                    .height(200.dp)
             )
 
             LoginForm(
@@ -120,16 +115,6 @@ fun LoginForm(modifier: Modifier = Modifier,navHostController: NavHostController
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = buildAnnotatedString {
-                withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
-                    append(stringResource(R.string.login))
-                }
-                    append(stringResource(R.string.s))
-                },
-                style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = modifier.padding(16.dp)
-            )
             TextField(state.studentID.value,
                 onValueChange = {
                     events(LoginEvents.OnStudentIDChanged(it))
@@ -201,6 +186,7 @@ fun LoginForm(modifier: Modifier = Modifier,navHostController: NavHostController
             ){
                 Text(text = stringResource(R.string.login),fontWeight = FontWeight.Bold)
             }
+
             TextButton(onClick = {
                 onRegister()
             }) {

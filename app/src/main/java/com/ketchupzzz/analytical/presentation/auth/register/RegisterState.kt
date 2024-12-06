@@ -12,7 +12,7 @@ data class RegisterState(
     val middleName: Fullname = Fullname(),
     val lastName: Fullname = Fullname(),
     val studentID : String = "",
-    val schoolLevel: SchoolLevel = SchoolLevel.JHS,
+    val schoolLevel: SchoolLevel = SchoolLevel.GRADE_7,
     val email: Email = Email(),
     val password: Password = Password(),
     val confirmPassword: Password = Password(),

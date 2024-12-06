@@ -87,7 +87,7 @@ fun CategoryScreen(
                                         color = MaterialTheme.colorScheme.surface,
                                         shape = MaterialTheme.shapes.medium
                                     )
-                                    .padding(8.dp),
+                                    .padding(12.dp),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
@@ -95,12 +95,6 @@ fun CategoryScreen(
                                     color = MaterialTheme.colorScheme.onSurface,
                                     style = MaterialTheme.typography.titleMedium
                                 )
-
-                                FilledIconButton(
-                                    onClick = {  navHostController.popBackStack() },
-                                    modifier = modifier.align(Alignment.CenterEnd)) {
-                                    Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription ="back" )
-                            }
                         }
                     })
                 }
@@ -133,7 +127,7 @@ private fun CategoryScreenPrev() {
         CategoryScreen(
             level = "GAGA",
             state = CategoryState(),
-            category = "REBUZ_PUZZLE",
+            category = "",
             events = {},
             navHostController = rememberNavController()
         )

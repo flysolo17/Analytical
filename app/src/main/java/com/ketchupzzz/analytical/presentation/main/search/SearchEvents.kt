@@ -4,9 +4,7 @@ import com.ketchupzzz.analytical.models.SchoolLevel
 
 
 sealed interface SearchEvents {
-    data class GetAllGames(
-        val schoolLevel: String
-    ) : SearchEvents
+    data object GetAllGames: SearchEvents
 
     data class OnSearching(val text : String) : SearchEvents
 

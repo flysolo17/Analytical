@@ -18,19 +18,22 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.ketchupzzz.analytical.R
 import com.ketchupzzz.analytical.models.submissions.RecentlyPlayed
+import com.ketchupzzz.analytical.models.submissions.Submissions
+import com.ketchupzzz.analytical.presentation.main.games.data.QuizWithLevels
 
 
 @Composable
 fun RecentlyPlayed(
     modifier: Modifier = Modifier,
-    recentlyPlayed: RecentlyPlayed
+    quizWithLevels: QuizWithLevels,
+    submissions : List<Submissions>,
 ) {
     Column(
         modifier = modifier.fillMaxWidth().padding(16.dp)
     ) {
         Text("Recently Played", style = MaterialTheme.typography.titleLarge)
         AsyncImage(
-            recentlyPlayed.image,
+            quizWithLevels.quiz?.cover_photo,
             error = painterResource(R.drawable.logo),
             placeholder = painterResource(R.drawable.logo),
             modifier = modifier.fillMaxWidth().height(180.dp).clip(
@@ -43,7 +46,7 @@ fun RecentlyPlayed(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text("${recentlyPlayed.name}", style = MaterialTheme.typography.titleLarge)
+            Text("${quizWithLevels.quiz?.title}", style = MaterialTheme.typography.titleLarge)
         }
 
     }

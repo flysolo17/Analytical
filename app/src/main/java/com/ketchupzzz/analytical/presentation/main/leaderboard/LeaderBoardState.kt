@@ -6,6 +6,7 @@ import com.ketchupzzz.analytical.models.submissions.Submissions
 
 data class LeaderBoardState(
     val isLoading : Boolean = false,
+    val errors : String ? = null,
     val students : List<Students> = emptyList(),
     val submissions: List<Submissions> = emptyList(),
     val leaderboard : List<StudentsWithSubmissions> = emptyList(),

@@ -32,7 +32,7 @@ fun generateRandomString(size: Int = 10): String {
 fun Int.getEndMinute() : String {
     val minutes = this / 60
     val seconds = this % 60
-    val clock = String.format("%02d:%02d mins", minutes, seconds)
+    val clock = String.format("%02d:%02d", minutes, seconds)
     return clock
 }
 
@@ -93,9 +93,12 @@ fun Double.getScoreMessage(): String {
 }
 
 fun List<LevelsWithSubmissions>.getMyCurrentLevel(): Int {
-    // Return the 1-based index of the first level without submissions
-    return this.indexOfFirst { it.submissions.isEmpty() } + 1
+    // Find the index of the first level without submissions
+    val index = this.indexOfFirst { it.submissions.isEmpty() }
+    // If all levels have submissions, return a default value, for example -1 or the size of the list (indicating all levels are completed)
+    return if (index == -1) this.size else index + 1
 }
+
 
 fun List<Submissions>.groupByLevels() {
 
@@ -116,12 +119,18 @@ fun Students.getStudentFullname() : String {
     return "${this.fname} ${this.mname?.get(0)}. ${this.lname}"
 }
 
+
+
+//Category.QUIZ_GAME -> "QUIZ GAME"
+//Category.MEMORY_GAME -> "MEMORY GAME"
+//Category.PUZZLE_GAME -> "PUZZLE GAME"
+//Category.MATH_GAME -> "MATH GAME"
 fun String.displayCategory(): String {
     return when (this) {
-        "REBUS_PUZZLE" -> "Rebus Puzzle"
-        "RIDDLES" -> "Riddles"
-        "WORD_PUZZLE" -> "Word Puzzle"
-        "MATH_LOGIC_PUZZLE" -> "Math Logic Puzzle"
+        "QUIZ_GAME" -> "Quiz Game"
+        "MEMORY_GAME" -> "Memory Game"
+        "PUZZLE_GAME" -> "Puzzle Game"
+        "MATH_GAME" -> "Math Game"
         else -> "Unknown Category"
     }
 }

@@ -5,7 +5,7 @@ import com.ketchupzzz.analytical.utils.Email
 
 data class ForgotPasswordState(
     val email : Email = Email(),
-    val loading : Boolean = false,
-    val hasError : Boolean = false,
-    val isComplete : Boolean  = false
+    val isLoading : Boolean = false,
+    val errors : String? = null,
+    val isComplete : String?  = null,
 )

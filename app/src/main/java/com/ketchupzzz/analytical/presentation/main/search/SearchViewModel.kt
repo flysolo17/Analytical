@@ -20,9 +20,12 @@ class SearchViewModel @Inject constructor(
 ) : ViewModel() {
     var state by mutableStateOf(SearchState())
 
+    init {
+        events(SearchEvents.GetAllGames)
+    }
     fun events(e : SearchEvents) {
         when(e) {
-            is SearchEvents.GetAllGames -> getGames(e.schoolLevel)
+            is SearchEvents.GetAllGames -> getGames()
             is SearchEvents.OnSearching -> searching(e.text)
             SearchEvents.ClearText -> state = state.copy(
                 searchText = ""
@@ -31,16 +34,13 @@ class SearchViewModel @Inject constructor(
     }
 
     private fun searching(text: String) {
-        val filtered = state.games.filter {
-            it.title?.contains(text, ignoreCase = true) == true
-        }
-        state = state.copy(filteredGames = filtered, searchText = text)
+        state = state.copy(searchText = text)
     }
 
 
-    private fun getGames(schoolLevel: String) {
+    private fun getGames() {
         viewModelScope.launch {
-            quizRepository.getAllQuizBySchoolLevel(schoolLevel) {
+            quizRepository.getAllQuiz {
                 state = when(it) {
                     is UiState.Error -> state.copy(
                         isLoading = false,

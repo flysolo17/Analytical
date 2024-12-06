@@ -20,6 +20,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -60,7 +61,15 @@ fun LeaderboardScreen(
 
 ) {
     LazyColumn {
-        item {
+        if (state.isLoading) {
+            item {
+                LinearProgressIndicator(
+                    modifier = modifier.fillMaxWidth()
+                )
+            }
+        }
+        if (!state.isLoading) {
+            item {
             Box(
                 modifier = modifier
                     .fillMaxWidth()
@@ -125,15 +134,18 @@ fun LeaderboardScreen(
                 )
             }
         }
-        item {
+            item {
             Text(text = "Leaderboard", style = MaterialTheme.typography.titleLarge.copy(
 
             ),
                 modifier = modifier.padding(8.dp))
         }
-        items(state.leaderboard) {
-            LeaderboardCard(studentWithSubmissions = it)
+
+            items(state.leaderboard) {
+                LeaderboardCard(studentWithSubmissions = it)
+            }
         }
+
     }
 }
 

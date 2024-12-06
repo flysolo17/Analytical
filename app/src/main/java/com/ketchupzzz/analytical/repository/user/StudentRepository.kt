@@ -1,5 +1,6 @@
 package com.ketchupzzz.analytical.repository.user
 
+import android.net.Uri
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.auth.User
 import com.ketchupzzz.analytical.models.SchoolLevel
@@ -49,4 +50,15 @@ interface StudentRepository {
     )
 
     suspend fun getStudents(result: (UiState<List<Students>>) -> Unit)
+
+    suspend fun updateProfile(
+        uid : String,
+        uri : Uri,
+        result: (UiState<String>) -> Unit
+    )
+    suspend fun getStudentProfile(result: (UiState<Students?>) -> Unit)
+
+
+    suspend fun forgotPassword(email: String) : Result<String>
+
 }

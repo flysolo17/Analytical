@@ -6,6 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.ketchupzzz.analytical.presentation.auth.forgot.ForgotPasswordScreen
+import com.ketchupzzz.analytical.presentation.auth.forgot.ForgotPasswordViewModel
 import com.ketchupzzz.analytical.presentation.auth.login.LoginScreen
 import com.ketchupzzz.analytical.presentation.auth.login.LoginViewModel
 import com.ketchupzzz.analytical.presentation.auth.register.RegisterScreen
@@ -27,7 +28,10 @@ fun NavGraphBuilder.authNavGraph(navHostController: NavHostController) {
             RegisterScreen(navHostController = navHostController, state = state, events = events)
         }
         composable(route = AppRouter.ForgotPasswordScreen.route) {
-            ForgotPasswordScreen()
+            val viewmodel = hiltViewModel<ForgotPasswordViewModel>()
+            val state = viewmodel.state
+            val events = viewmodel::onEvents
+            ForgotPasswordScreen(navHostController = navHostController, state = state, events = events)
         }
     }
 }

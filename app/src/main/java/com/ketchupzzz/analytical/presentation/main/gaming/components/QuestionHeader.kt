@@ -42,39 +42,36 @@ fun QuestionHeader(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(16.dp)
             .background(
                 color = MaterialTheme.colorScheme.background,
                 shape = RoundedCornerShape(16.dp)
             )
-
     ) {
-        Row(
-            modifier = modifier.fillMaxWidth().padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
+        if (!question.hint.isNullOrEmpty()) {
+            Box(
+                modifier = modifier.fillMaxWidth().padding(2.dp),
+                contentAlignment = Alignment.CenterEnd
+            ) {
+                HintDialog(hintText = question.hint)
+            }
+        }
+        if (!question.question.isNullOrEmpty()) {
             Text(
-                modifier = modifier.fillMaxWidth().weight(1f),
+                modifier = modifier.fillMaxWidth().padding(4.dp),
                 text = "${question.question}",
                 style = MaterialTheme.typography.titleSmall.copy(
                     color = MaterialTheme.colorScheme.onBackground,
                     fontWeight = FontWeight.Black,
                 ),
-                textAlign = TextAlign.Start
+                textAlign = TextAlign.Center
             )
-            if (!question.hint.isNullOrEmpty()) {
-                HintDialog(hintText = question.hint)
-            }
         }
+
+
         if (!question.image.isNullOrEmpty()) {
             AsyncImage(
                 modifier = modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-                    .padding(
-                        horizontal = 12.dp
-                    ),
+                    .fillMaxSize().clip(MaterialTheme.shapes.large),
                 model = question.image,
                 contentDescription = "Image",
                 contentScale = ContentScale.Crop,
@@ -96,9 +93,10 @@ fun QuestionHeader(
                         Spacer(modifier = modifier.width(24.dp))
                     } else {
                         Card(
+                            shape = RoundedCornerShape(2.dp),
                             modifier = modifier
-                                .size(48.dp)
-                                .padding(4.dp)
+                                .size(32.dp)
+                                .padding(2.dp)
                         ) {
                             Box(
                                 modifier = modifier.fillMaxSize(),

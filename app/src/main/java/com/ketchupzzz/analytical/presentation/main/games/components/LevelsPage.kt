@@ -94,7 +94,7 @@ fun LevelsPage(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Levels",
+                    text = "Levels ${currentLevel}",
                     style = MaterialTheme.typography.titleLarge
                 )
             }
@@ -146,9 +146,23 @@ fun LevelItems(
             state = state,
             e =e ,
             onStart = {
-                navHostController.navigate(AppRouter.GamingScreen.createRoute(
-                    QuizAndLevel(quiz = quiz, level = levels)
-                ))
+                when (quiz.category) {
+                    Category.MATH_GAME -> {
+                        navHostController.navigate(AppRouter.CrossMath.createRoute(
+                            QuizAndLevel(quiz = quiz, level = levels)
+                        ))
+                    }
+                    Category.MEMORY_GAME -> {
+                        navHostController.navigate(AppRouter.MemoryGame.createRoute(
+                            QuizAndLevel(quiz = quiz, level = levels)
+                        ))
+                    }
+                    else -> {
+                        navHostController.navigate(AppRouter.GamingScreen.createRoute(
+                            QuizAndLevel(quiz = quiz, level = levels)
+                        ))
+                    }
+                }
                 showBottomSheet = false
             }
         )
@@ -160,7 +174,7 @@ fun LevelItems(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(enabled = isVisible) {  // Disable click if myLevel > currentLevel
+            .clickable(enabled = isVisible) {
                 showBottomSheet = true
             }
             .then(

@@ -1,5 +1,16 @@
 package com.ketchupzzz.analytical.models
 
 enum class Category {
-    REBUS_PUZZLE, RIDDLES, WORD_PUZZLE, MATH_LOGIC_PUZZLE
+    QUIZ_GAME, MEMORY_GAME, PUZZLE_GAME, MATH_GAME
 }
+
+
+fun Category.displayName() : String{
+    return when(this) {
+        Category.QUIZ_GAME -> "QUIZ GAME"
+        Category.MEMORY_GAME -> "MEMORY GAME"
+        Category.PUZZLE_GAME -> "PUZZLE GAME"
+        Category.MATH_GAME -> "MATH GAME"
+    }
+}
+

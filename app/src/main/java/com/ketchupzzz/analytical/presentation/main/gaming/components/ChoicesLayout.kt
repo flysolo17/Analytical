@@ -46,7 +46,7 @@ fun ChoicesLayout(
 
     Column(
         modifier = modifier
-            .fillMaxSize(),
+            .wrapContentSize(),
     ) {
         question.choices.forEachIndexed { index, choice ->
             Button(
@@ -66,6 +66,7 @@ fun ChoicesLayout(
                     .padding(vertical = 4.dp),
                 onClick = {
                     selected = choice
+                    selected?.let { onNext(it) }
                 }
             ) {
                 Row(
@@ -92,32 +93,5 @@ fun ChoicesLayout(
                 }
             }
         }
-        Spacer(
-            modifier = modifier.fillMaxSize().weight(1f)
-        )
-        IconButton(
-            colors = IconButtonDefaults.iconButtonColors(
-                containerColor = Color(0xFFFFA500),
-                contentColor = Color.Black
-            ),
-            onClick = {
-                selected?.let { onNext(it) }
-            },
-            enabled = selected != null,
-            modifier = Modifier
-                .align(Alignment.End)
-                .clip(
-                    RoundedCornerShape(
-                        topStart = 16.dp,
-                        bottomStart = 16.dp
-                    )
-                )
-        ) {
-            Icon(
-                imageVector = Icons.Filled.ArrowForwardIos,
-                contentDescription = "next"
-            )
-        }
-
     }
 }

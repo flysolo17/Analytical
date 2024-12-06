@@ -15,6 +15,10 @@ import com.ketchupzzz.analytical.presentation.auth.edit_profile.EditProfileScree
 import com.ketchupzzz.analytical.presentation.auth.edit_profile.EditProfileViewModel
 import com.ketchupzzz.analytical.presentation.main.category.CategoryScreen
 import com.ketchupzzz.analytical.presentation.main.category.CategoryViewModel
+import com.ketchupzzz.analytical.presentation.main.crossmath.CrossMathEvents
+import com.ketchupzzz.analytical.presentation.main.crossmath.CrossMathScreen
+import com.ketchupzzz.analytical.presentation.main.crossmath.CrossMathViewModel
+import com.ketchupzzz.analytical.presentation.main.dashboard.DashboardEvents
 import com.ketchupzzz.analytical.presentation.main.dashboard.DashboardScreen
 import com.ketchupzzz.analytical.presentation.main.dashboard.DashboardViewmodel
 import com.ketchupzzz.analytical.presentation.main.finish_game.FinishGameScreen
@@ -27,6 +31,10 @@ import com.ketchupzzz.analytical.presentation.main.gaming.GamingViewModel
 import com.ketchupzzz.analytical.presentation.main.gaming.data.SubmissionData
 import com.ketchupzzz.analytical.presentation.main.leaderboard.LeaderBoardViewModel
 import com.ketchupzzz.analytical.presentation.main.leaderboard.LeaderboardScreen
+import com.ketchupzzz.analytical.presentation.main.matching_card.MatchingCardEvents
+import com.ketchupzzz.analytical.presentation.main.matching_card.MatchingCardScreen
+import com.ketchupzzz.analytical.presentation.main.matching_card.MatchingCardState
+import com.ketchupzzz.analytical.presentation.main.matching_card.MatchingCardViewModel
 import com.ketchupzzz.analytical.presentation.main.profile.ProfileScreen
 import com.ketchupzzz.analytical.presentation.main.profile.ProfileViewModel
 import com.ketchupzzz.analytical.presentation.main.search.SearchScreen
@@ -38,8 +46,10 @@ import java.nio.charset.StandardCharsets
 
 
 @Composable
-fun MainNavGraph(navHostController: NavHostController,mainNavHostController: NavHostController) {
-    val studentViewmodel = hiltViewModel<SubmissionsViewModel>()
+fun MainNavGraph(
+    navHostController: NavHostController,
+    mainNavHostController: NavHostController
+) {
 
     NavHost(
         navController = navHostController,
@@ -61,9 +71,7 @@ fun MainNavGraph(navHostController: NavHostController,mainNavHostController: Nav
 
         composable(route = AppRouter.Search.route) {
             val viewModel = hiltViewModel<SearchViewModel>()
-            val id = it.arguments?.getString("args") ?: ""
             SearchScreen(
-                level = id,
                 state= viewModel.state,
                 events = viewModel::events,
                 navHostController = navHostController
@@ -134,6 +142,59 @@ fun MainNavGraph(navHostController: NavHostController,mainNavHostController: Nav
                     e = viewModel::events,
                     navHostController = navHostController,
                     args = quizAndLevel
+                )
+            } else {
+                UnknownError(
+                    title = "Page not found!",
+                    actions = {
+                        navHostController.popBackStack()
+                    }
+                )
+            }
+        }
+
+        composable(
+            route = AppRouter.MemoryGame.route,
+            arguments = listOf(navArgument("quizAndLevel") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val json = backStackEntry.arguments?.getString("quizAndLevel")
+            val decodedJson = URLDecoder.decode(json, StandardCharsets.UTF_8.toString())
+            val quizAndLevel = Gson().fromJson(decodedJson, QuizAndLevel::class.java)
+
+            val viewModel = hiltViewModel<MatchingCardViewModel>()
+
+            if (quizAndLevel != null) {
+                MatchingCardScreen(
+                    state = viewModel.state,
+                    events = viewModel::events,
+                    navHostController = navHostController,
+                    args = quizAndLevel
+                )
+            } else {
+                UnknownError(
+                    title = "Page not found!",
+                    actions = {
+                        navHostController.popBackStack()
+                    }
+                )
+            }
+        }
+
+
+        composable(
+            route = AppRouter.CrossMath.route,
+            arguments = listOf(navArgument("quizAndLevel") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val json = backStackEntry.arguments?.getString("quizAndLevel")
+            val decodedJson = URLDecoder.decode(json, StandardCharsets.UTF_8.toString())
+            val quizAndLevel = Gson().fromJson(decodedJson, QuizAndLevel::class.java)
+            val viewModel = hiltViewModel<CrossMathViewModel>()
+            if (quizAndLevel != null) {
+                CrossMathScreen(
+                    state = viewModel.state,
+                    events = viewModel::events,
+                    navHostController = navHostController,
+                    quiz = quizAndLevel
                 )
             } else {
                 UnknownError(

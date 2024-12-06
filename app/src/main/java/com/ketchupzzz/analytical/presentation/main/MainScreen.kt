@@ -49,12 +49,6 @@ fun MainScreen(modifier: Modifier = Modifier,mainNav: NavHostController) {
     if (navigationItems.any { it.route == currentRoute }) {
         val isDashBoard = currentRoute == AppRouter.DashboardScreen.route
         Scaffold(
-            topBar = {
-                if (isDashBoard) {
-                    LargeTopAppBarWithCustomTitle()
-                }
-
-            },
             bottomBar = {
                 BottomNavBar(navController = navHostController, items = navigationItems,navBackStackEntry = navBackStackEntry)
             },
@@ -79,7 +73,7 @@ fun MainScreen(modifier: Modifier = Modifier,mainNav: NavHostController) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LargeTopAppBarWithCustomTitle(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     LargeTopAppBar(
         modifier = Modifier

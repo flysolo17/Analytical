@@ -51,14 +51,11 @@ import com.ketchupzzz.analytical.utils.UnknownError
 @Composable
 fun SearchScreen(
     modifier: Modifier = Modifier,
-    level: String,
     state: SearchState,
     events: (SearchEvents) -> Unit,
     navHostController: NavHostController
 ) {
-    LaunchedEffect(true) {
-        events(SearchEvents.GetAllGames(level))
-    }
+
     when {
         state.isLoading -> ProgressBar(
             title = "Loading"
@@ -68,8 +65,9 @@ fun SearchScreen(
         )
         else -> {
             Scaffold(
+
                 topBar = { TopAppBar(
-                    title = { Text(text = "Search Games for ${level}")},
+                    title = { Text(text = "Search Games")},
                     navigationIcon = { IconButton(onClick = {  navHostController.popBackStack() }) {
                        Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription ="back" )
                     }}
@@ -91,10 +89,9 @@ fun SearchScreen(
                                 Text(text = "Search Games here")
                             },
                             trailingIcon = {
-                                           IconButton(onClick = { events.invoke(SearchEvents.ClearText) }) {
-
-                                               Icon(imageVector = Icons.Rounded.Clear, contentDescription = "Clear")
-                                           }
+                                  IconButton(onClick = { events.invoke(SearchEvents.ClearText) }) {
+                                      Icon(imageVector = Icons.Rounded.Clear, contentDescription = "Clear")
+                                  }
                             },
                             leadingIcon = {
                                 Icon(
@@ -102,22 +99,22 @@ fun SearchScreen(
                                     contentDescription = ""
                                 )
                             },
-                            onValueChange = { events(SearchEvents.OnSearching(it))
+                            onValueChange = { events(SearchEvents.OnSearching(it) )
                             })
                     }
                     item { 
                         Text(text = "Games (${state.filteredGames.size})", style = MaterialTheme.typography.titleLarge)
                     }
                     items(state.filteredGames) {
-                        GameCard(
-                            modifier = modifier,
-                            quiz = it,
-                            onPlay = {
-                                it.id?.let {e ->
-                                    navHostController.navigate(AppRouter.GameScreen.createRoute(e))
-                                }
-                            }
-                        )
+//                        GameCard(
+//                            modifier = modifier,
+//                            quiz = it,
+//                            onPlay = {
+//                                it.id?.let {e ->
+//                                    navHostController.navigate(AppRouter.GameScreen.createRoute(e))
+//                                }
+//                            }
+//                        )
                     }
                 }
             }

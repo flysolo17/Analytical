@@ -1,6 +1,9 @@
 package com.ketchupzzz.analytical.presentation.main.profile
 
 import android.annotation.SuppressLint
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
@@ -40,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 
 import androidx.compose.ui.unit.dp
@@ -51,6 +55,7 @@ import com.ketchupzzz.analytical.presentation.navigation.AppRouter
 import com.ketchupzzz.analytical.utils.Profile
 import com.ketchupzzz.analytical.utils.getScoreMessage
 import com.ketchupzzz.analytical.utils.getStudentFullname
+import com.ketchupzzz.analytical.utils.toast
 import ir.ehsannarmani.compose_charts.PieChart
 import ir.ehsannarmani.compose_charts.models.Pie
 
@@ -62,11 +67,23 @@ fun ProfileScreen(
     navHostController: NavHostController,
     mainNav: NavHostController
 ) {
+    val context = LocalContext.current
     LaunchedEffect(state) {
         if (state.students != null) {
             events.invoke(ProfileEvents.OnGetSubmissions(state.students.id!!))
         }
+        if (state.isProfileUploaded != null) {
+            context.toast(state.isProfileUploaded)
+        }
     }
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            events(ProfileEvents.OnUploadProfile(it))
+        }
+    }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -76,6 +93,7 @@ fun ProfileScreen(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Profile(imageURL = state.students?.profile ?: "", size = 80.dp) {
+            imagePickerLauncher.launch("image/*")
         }
         Text(text = "${state.students?.getStudentFullname()}", style = MaterialTheme.typography.titleLarge)
         Text(text = "${state.students?.id} (${state.students?.schoolLevel})")
@@ -223,10 +241,10 @@ fun StudentStatistics(
             )
         )
         var data = listOf(
-            Pie(label = "Rebus Puzzle",data = state.rebusAverage?.average ?: 0.0, color = Color.Red, selectedColor = Color.Green),
-            Pie(label = "Riddles",data = state.riddlesAverage?.average ?: 0.0, color = Color.Cyan, selectedColor = Color.Blue),
-            Pie(label = "Word Puzzle",data = state.wordPuzzleAverage?.average ?: 0.0, color = Color.Yellow, selectedColor = Color.Gray),
-            Pie(label = "Math  Logic",data = state.mathLogicAverage?.average ?: 0.0, color = Color.Magenta, selectedColor = Color(0xFFFFA500)),
+            Pie(label = "Quiz Game",data = state.mathGame?.average ?: 0.0, color = Color.Red, selectedColor = Color.Green),
+            Pie(label = "Memory Game",data = state.memoryGame?.average ?: 0.0, color = Color.Cyan, selectedColor = Color.Blue),
+            Pie(label = "Puzzle Game",data = state.puzzleGame?.average ?: 0.0, color = Color.Yellow, selectedColor = Color.Gray),
+            Pie(label = "Math  Game",data = state.mathGame?.average ?: 0.0, color = Color.Magenta, selectedColor = Color(0xFFFFA500)),
         )
         Row(
             modifier = modifier.fillMaxWidth(),

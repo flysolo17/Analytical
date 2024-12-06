@@ -1,18 +1,22 @@
 package com.ketchupzzz.analytical.repository.user
 
+import android.net.Uri
 import androidx.compose.runtime.mutableStateOf
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.auth.User
 import com.google.firebase.firestore.toObjects
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageException
 import com.ketchupzzz.analytical.models.SchoolLevel
 import com.ketchupzzz.analytical.models.Students
 import com.ketchupzzz.analytical.models.StudentsWithSubmissions
 import com.ketchupzzz.analytical.utils.UiState
+import com.ketchupzzz.analytical.utils.generateRandomString
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -234,7 +238,6 @@ class StudentRepositoryImpl(
     }
 
     override suspend fun getStudents(result: (UiState<List<Students>>) -> Unit) {
-
         firestore.collection(
             STUDENTS_COLLECTION
         ).addSnapshotListener { value, error ->
@@ -242,6 +245,63 @@ class StudentRepositoryImpl(
                 val students = it.toObjects(Students::class.java)
                 result.invoke(UiState.Success(students))
             }
+        }
+    }
+
+    override suspend fun updateProfile(
+        uid : String,
+        uri: Uri,
+        result: (UiState<String>) -> Unit
+    ) {
+        try {
+            val storageRef = storage.reference.child(
+                "${STUDENTS_COLLECTION}/${uid}/${generateRandomString(10)}"
+            )
+            val uploadTask = storageRef.putFile(uri).await()
+            val downloadUrl =storageRef.downloadUrl.await()
+            firestore.collection(STUDENTS_COLLECTION)
+                .document(uid)
+                .update(
+                    "profile",downloadUrl
+                ).await()
+            result(UiState.Success("Successfully Updated!"))
+        } catch (e: StorageException) {
+            result(UiState.Error("Storage error: ${e.message}"))
+        } catch (e: FirebaseFirestoreException) {
+            result(UiState.Error("Firestore error: ${e.message}"))
+        } catch (e: Exception) {
+            result(UiState.Error("Unexpected error: ${e.message}"))
+        }
+    }
+
+    override suspend fun getStudentProfile(result : (UiState<Students?>) -> Unit) {
+        val currentUser = auth.currentUser
+        if (currentUser == null) {
+            result(UiState.Error("User not found!"))
+            return
+        }
+        firestore.collection(STUDENTS_COLLECTION)
+            .whereEqualTo("email",currentUser.email)
+            .limit(1)
+            .addSnapshotListener { value, error ->
+                error?.let {
+                    result(UiState.Error(it.message.toString()))
+                }
+                value?.let {
+                    val user =    it.toObjects(Students::class.java)
+                    result(UiState.Success(
+                        user.firstOrNull()
+                    ))
+                }
+            }
+    }
+
+    override suspend fun forgotPassword(email: String): Result<String> {
+        return  try {
+            val result = auth.sendPasswordResetEmail(email).await()
+            Result.success("We sent an email to ${email}.")
+        } catch (e : Exception) {
+            Result.failure(e)
         }
     }
 

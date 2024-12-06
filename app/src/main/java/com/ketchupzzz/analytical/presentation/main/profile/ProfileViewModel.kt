@@ -1,5 +1,6 @@
 package com.ketchupzzz.analytical.presentation.main.profile
 
+import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -26,8 +27,24 @@ class ProfileViewModel @Inject constructor(
     var state by mutableStateOf(ProfileState())
     init {
         viewModelScope.launch {
-            studentRepository.getStudent().collect { data ->
-                state = state.copy(students = data)
+            studentRepository.getStudentProfile {  data ->
+                state = when(data) {
+                    is UiState.Error -> state.copy(
+                        isLoading = false,
+                        errors = data.message
+                    )
+
+                    UiState.Loading -> state.copy(
+                        isLoading = true,
+                        errors = null
+                    )
+
+                    is UiState.Success -> state.copy(
+                        isLoading = false,
+                        errors = null,
+                        students =data.data
+                    )
+                }
             }
         }
     }
@@ -35,6 +52,35 @@ class ProfileViewModel @Inject constructor(
         when(e) {
             is ProfileEvents.OnLoggedOut -> logout(e.navHostController)
             is ProfileEvents.OnGetSubmissions -> getAllSubmissions(e.sid)
+            is ProfileEvents.OnUploadProfile -> upload(e.uri)
+        }
+    }
+
+    private fun upload(uri: Uri) {
+        if (state.students == null ) {
+            return
+        }
+        viewModelScope.launch {
+            studentRepository.updateProfile(
+                state.students?.id ?: "",
+                uri
+            ){
+                state = when(it) {
+                    is UiState.Error -> state.copy(
+                        isLoading = false,
+                        errors = it.message
+                    )
+                    UiState.Loading -> state.copy(
+                        isLoading = true,
+                        errors = null
+                    )
+                    is UiState.Success -> state.copy(
+                        isLoading = false,
+                        errors = null,
+                        isProfileUploaded = it.data
+                    )
+                }
+            }
         }
     }
 
@@ -44,10 +90,10 @@ class ProfileViewModel @Inject constructor(
                 if (it is UiState.Success) {
                     state = state.copy(
                         submissions = it.data,
-                        mathLogicAverage = it.data.groupSubmissionsByCategoryAndGetAverageScore(Category.MATH_LOGIC_PUZZLE),
-                        rebusAverage = it.data.groupSubmissionsByCategoryAndGetAverageScore(Category.REBUS_PUZZLE),
-                        riddlesAverage = it.data.groupSubmissionsByCategoryAndGetAverageScore(Category.RIDDLES),
-                        wordPuzzleAverage = it.data.groupSubmissionsByCategoryAndGetAverageScore(Category.WORD_PUZZLE)
+                        mathGame = it.data.groupSubmissionsByCategoryAndGetAverageScore(Category.MATH_GAME),
+                        memoryGame = it.data.groupSubmissionsByCategoryAndGetAverageScore(Category.MEMORY_GAME),
+                        quizGame = it.data.groupSubmissionsByCategoryAndGetAverageScore(Category.QUIZ_GAME),
+                        puzzleGame = it.data.groupSubmissionsByCategoryAndGetAverageScore(Category.PUZZLE_GAME)
                     )
                 }
             }

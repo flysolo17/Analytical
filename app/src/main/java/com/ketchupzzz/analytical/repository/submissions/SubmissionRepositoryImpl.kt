@@ -14,7 +14,8 @@ const val GAME_COLLECTION = "recentlyPlayed"
 class SubmissionRepositoryImpl(private val firestore: FirebaseFirestore): SubmissionRepository {
 
 
-    override fun submitQuiz(submission: Submissions, result: (UiState<String>) -> Unit) {
+    override suspend fun submitQuiz(submission: Submissions, result: (UiState<String>) -> Unit) {
+        result.invoke(UiState.Loading)
         val  batch = firestore.batch()
         submission.id = firestore.collection(SUBMISSIONS_COLLECTION).document().id
         result.invoke(UiState.Loading)
@@ -54,6 +55,7 @@ class SubmissionRepositoryImpl(private val firestore: FirebaseFirestore): Submis
     }
 
     override suspend fun getAllSubmissions(result: (UiState<List<Submissions>>) -> Unit) {
+        result.invoke(UiState.Loading)
         firestore.collection(SUBMISSIONS_COLLECTION)
             .addSnapshotListener { value, error ->
                 value?.let {

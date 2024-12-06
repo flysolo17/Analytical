@@ -26,5 +26,4 @@ sealed interface GamingEvents {
     data class OnUpdateTimer(val time : Int) : GamingEvents
     data class OnAnswerChanged(val text : String,val index : Int) : GamingEvents
     data object OnReset : GamingEvents
-
 }

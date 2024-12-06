@@ -19,3 +19,5 @@ data class Questions(
     val createdAt : Date = Date(),
     val updatedAt : Date = Date()
 ): Parcelable
+
+

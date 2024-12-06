@@ -97,13 +97,30 @@ class GamingViewModel @Inject constructor(
                     name = quiz.title,
                     levels = level
                )
+
+
           )
-          submissionsRepository.submitQuiz(submissions) {
-               if (it is UiState.Success) {
-                    state = state.copy(
-                         isFinish = true
-                    )
-                    context.toast(it.data)
+
+          viewModelScope.launch {
+               submissionsRepository.submitQuiz(submissions) {
+                    when(it) {
+                         is UiState.Error -> state = state.copy(
+                              isLoading = false,
+                              errors = it.message
+                         )
+                         UiState.Loading -> state = state.copy(
+                              isLoading = true,
+                              errors = null,
+                         )
+                         is UiState.Success -> {
+                              context.toast(it.data)
+                              state = state.copy(
+                                   isLoading = false,
+                                   errors = null,
+                                   isFinish = true
+                              )
+                         }
+                    }
                }
           }
      }

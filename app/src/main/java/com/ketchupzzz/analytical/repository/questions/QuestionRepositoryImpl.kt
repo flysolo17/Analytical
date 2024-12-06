@@ -10,8 +10,7 @@ import com.ketchupzzz.analytical.models.Category
 import com.ketchupzzz.analytical.models.questions.Questions
 import com.ketchupzzz.analytical.models.quiz.Quiz
 import com.ketchupzzz.analytical.models.QuizWithQuestions
-import com.ketchupzzz.analytical.models.questions.QuestionSettings
-import com.ketchupzzz.analytical.models.questions.generateRandomIDS
+
 import com.ketchupzzz.analytical.utils.UiState
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay

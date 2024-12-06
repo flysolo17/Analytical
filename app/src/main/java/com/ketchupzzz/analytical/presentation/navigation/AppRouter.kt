@@ -16,10 +16,8 @@ sealed class AppRouter(val route : String) {
     object MainRoutes : AppRouter(route = "main")
     object DashboardScreen: AppRouter(route = "dashboard")
 
-    data object Search: AppRouter(route = "search/{args}") {
-        fun navigate(schoolLevel: String) : String{
-            return "search/${schoolLevel}"
-        }
+    data object Search: AppRouter(route = "search") {
+
     }
     data object Category: AppRouter(route = "category/{args}") {
         fun navigate(schoolLevel: String, category: String): String {
@@ -40,6 +38,21 @@ sealed class AppRouter(val route : String) {
             val quizAndLevelJson = Gson().toJson(q)
             val encodedJson = URLEncoder.encode(quizAndLevelJson, StandardCharsets.UTF_8.toString())
             return "gaming/$encodedJson"
+        }
+    }
+
+    object CrossMath : AppRouter(route = "cross-math/{quizAndLevel}") {
+        fun createRoute(q: QuizAndLevel): String {
+            val quizAndLevelJson = Gson().toJson(q)
+            val encodedJson = URLEncoder.encode(quizAndLevelJson, StandardCharsets.UTF_8.toString())
+            return "cross-math/$encodedJson"
+        }
+    }
+    object MemoryGame : AppRouter(route = "memory-game/{quizAndLevel}") {
+        fun createRoute(q: QuizAndLevel): String {
+            val quizAndLevelJson = Gson().toJson(q)
+            val encodedJson = URLEncoder.encode(quizAndLevelJson, StandardCharsets.UTF_8.toString())
+            return "memory-game/$encodedJson"
         }
     }
 

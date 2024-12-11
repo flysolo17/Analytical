@@ -167,9 +167,13 @@ fun DashboardScreen(
                 items(
                     category[state.selected].quiz,
                     key = {it.id ?: System.currentTimeMillis()}
-                ) {
-                    QuizItem(item = it) {
-                        navHostController.navigate(AppRouter.GameScreen.createRoute(it))
+                ) {game ->
+                    QuizItem(item = game) {
+                        if (game.category == Category.PUZZLE_GAME) {
+                            navHostController.navigate(AppRouter.DIFFICULTY.createRoute(it))
+                        } else {
+                            navHostController.navigate(AppRouter.GameScreen.createRoute(it,"no"))
+                        }
                     }
                 }
 
@@ -262,7 +266,7 @@ fun GamesList(categoryWithQuiz: CategoryWithQuiz ,modifier: Modifier = Modifier,
 
         items(list, key = {it.id!!}) {
             QuizItem(item = it) {
-                navHostController.navigate(AppRouter.GameScreen.createRoute(it))
+                navHostController.navigate(AppRouter.GameScreen.createRoute(it,"no"))
             }
         }
     }

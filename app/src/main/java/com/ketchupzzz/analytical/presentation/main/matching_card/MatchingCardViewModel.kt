@@ -73,7 +73,7 @@ class MatchingCardViewModel @Inject constructor(
 
     private fun resetGame() {
         viewModelScope.launch {
-            delay(1000)
+            delay(3000)
             state = state.copy(
                 cards = state.cards.map { card ->
                     card.copy(isFront = false)

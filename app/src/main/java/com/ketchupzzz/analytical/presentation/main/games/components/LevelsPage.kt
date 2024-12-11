@@ -63,6 +63,7 @@ import com.ketchupzzz.analytical.utils.RatingBar
 import com.ketchupzzz.analytical.utils.getHexBackground
 import com.ketchupzzz.analytical.utils.getMyCurrentLevel
 import com.ketchupzzz.analytical.utils.getNextLevel
+import com.ketchupzzz.analytical.utils.isGreaterThanEqual80Percent
 import kotlinx.coroutines.launch
 
 
@@ -70,6 +71,7 @@ import kotlinx.coroutines.launch
 fun LevelsPage(
     quiz: Quiz,
     levels: List<LevelsWithSubmissions>,
+    difficulty : String,
     modifier: Modifier = Modifier,
     state: GameState,
     e: (GameEvents) -> Unit,
@@ -78,7 +80,9 @@ fun LevelsPage(
    val newLevels =  levels.sortedBy {
         it.levels.levelNumber
     }
+
     val currentLevel = newLevels.getMyCurrentLevel()
+    val gameLevels = newLevels.firstOrNull { it.levels.levelNumber == currentLevel }
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(3),
@@ -86,20 +90,21 @@ fun LevelsPage(
         verticalArrangement = Arrangement.spacedBy(4.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        item(
-            span = { GridItemSpan(3) }
-        ) {
-            Box(
-                modifier = modifier.fillMaxWidth().padding(16.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "Levels ${currentLevel}",
-                    style = MaterialTheme.typography.titleLarge
-                )
+
+        val levelDifficulty = when {
+            difficulty.equals("easy", ignoreCase = true) -> {
+                newLevels.take(10)
             }
+            difficulty.equals("medium", ignoreCase = true) -> {
+                newLevels.subList(10, minOf(20, newLevels.size))
+            }
+            difficulty.equals("hard", ignoreCase = true) -> {
+                if (newLevels.size > 20) newLevels.subList(20, newLevels.size) else emptyList()
+            }
+            else -> newLevels
         }
-        items(items = newLevels, key = {it.levels.id }) {
+
+        items(items = levelDifficulty, key = {it.levels.id }) {
             val myLevel: Int = it.levels.levelNumber
             LevelItems(
                 quiz = quiz,

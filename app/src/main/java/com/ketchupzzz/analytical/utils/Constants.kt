@@ -19,6 +19,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import kotlin.random.Random
+import kotlin.time.times
 
 
 fun generateRandomString(size: Int = 10): String {
@@ -92,17 +93,27 @@ fun Double.getScoreMessage(): String {
     }
 }
 
+
+
 fun List<LevelsWithSubmissions>.getMyCurrentLevel(): Int {
-    // Find the index of the first level without submissions
-    val index = this.indexOfFirst { it.submissions.isEmpty() }
-    // If all levels have submissions, return a default value, for example -1 or the size of the list (indicating all levels are completed)
-    return if (index == -1) this.size else index + 1
+
+    for (index in indices) {
+        val currentLevel = this[index]
+
+        if (currentLevel.submissions.isEmpty()) return index + 1
+
+        if (!currentLevel.isGreaterThanEqual80Percent()) return index + 1
+    }
+    return size + 1
 }
 
-
-fun List<Submissions>.groupByLevels() {
-
+fun LevelsWithSubmissions.isGreaterThanEqual80Percent(): Boolean {
+    val maxScore = this.levels.points * this.levels.questions
+    val submissions = this.submissions.sortedByDescending { it.performance.earning }
+    val myScore = submissions.getOrNull(0)?.performance?.earning ?: 0.00
+    return myScore >= (maxScore * 0.8)
 }
+
 
 fun List<LevelsWithSubmissions>.getNextLevel(currentLevelIndex: Int): Levels? {
     return this.drop(currentLevelIndex + 1)
@@ -120,6 +131,19 @@ fun Students.getStudentFullname() : String {
 }
 
 
+
+fun List<Levels>.toLevelWithSubmissions(submissions: List<Submissions>) : List<LevelsWithSubmissions> {
+    val levelsWithSubmissions : MutableList<LevelsWithSubmissions> = mutableListOf()
+    for (level in this) {
+        levelsWithSubmissions.add(
+            LevelsWithSubmissions(
+                levels = level,
+                submissions = submissions.filter { it.quizInfo?.levels?.id == level.id }
+            )
+        )
+    }
+   return levelsWithSubmissions.sortedBy { it.levels.levelNumber }
+}
 
 //Category.QUIZ_GAME -> "QUIZ GAME"
 //Category.MEMORY_GAME -> "MEMORY GAME"

@@ -136,6 +136,7 @@ fun ProfileSettings(
         }
         val logoutColor = MaterialTheme.colorScheme.error
         val textLogoutColor = MaterialTheme.colorScheme.onError
+
         SettingsAction(title = "Log out", icon = Icons.Rounded.Logout,
             isLoading = state.isLoading,
             color = ButtonDefaults.buttonColors(
@@ -241,7 +242,7 @@ fun StudentStatistics(
             )
         )
         var data = listOf(
-            Pie(label = "Quiz Game",data = state.mathGame?.average ?: 0.0, color = Color.Red, selectedColor = Color.Green),
+            Pie(label = "Quiz Game",data = state.mathGame?.average ?: 0.0, color = Color.Green, selectedColor = Color.Green),
             Pie(label = "Memory Game",data = state.memoryGame?.average ?: 0.0, color = Color.Cyan, selectedColor = Color.Blue),
             Pie(label = "Puzzle Game",data = state.puzzleGame?.average ?: 0.0, color = Color.Yellow, selectedColor = Color.Gray),
             Pie(label = "Math  Game",data = state.mathGame?.average ?: 0.0, color = Color.Magenta, selectedColor = Color(0xFFFFA500)),

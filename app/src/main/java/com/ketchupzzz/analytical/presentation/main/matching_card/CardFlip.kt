@@ -45,7 +45,7 @@ fun CardFlip(
 
     Box(
         modifier = modifier
-            .size(100.dp)
+            .size(90.dp)
             .clickable {
                 if (!rotation.isRunning && !haveMatch) {
                     onFlip(card)
@@ -72,7 +72,7 @@ fun CardFlip(
                         model = card.choice,
                         contentDescription = "Front Image",
                         modifier = Modifier.fillMaxSize(),
-                        placeholder = painterResource(R.drawable.hex_1)
+                        placeholder = painterResource(R.drawable.logo)
                     )
                 }
             } else {
@@ -85,7 +85,7 @@ fun CardFlip(
                     contentAlignment = Alignment.Center
                 ) {
                     Image(
-                        painter = painterResource(R.drawable.back),
+                        painter = painterResource(R.drawable.back2),
                         modifier = Modifier.fillMaxSize(),
                         contentDescription = "Back Image",
                         contentScale = ContentScale.Crop

@@ -21,6 +21,8 @@ import com.ketchupzzz.analytical.presentation.main.crossmath.CrossMathViewModel
 import com.ketchupzzz.analytical.presentation.main.dashboard.DashboardEvents
 import com.ketchupzzz.analytical.presentation.main.dashboard.DashboardScreen
 import com.ketchupzzz.analytical.presentation.main.dashboard.DashboardViewmodel
+import com.ketchupzzz.analytical.presentation.main.difficulty_screen.DifficultyScreen
+import com.ketchupzzz.analytical.presentation.main.difficulty_screen.DifficultyViewModel
 import com.ketchupzzz.analytical.presentation.main.finish_game.FinishGameScreen
 import com.ketchupzzz.analytical.presentation.main.finish_game.FinishGameViewModel
 import com.ketchupzzz.analytical.presentation.main.games.GameScreen
@@ -116,14 +118,27 @@ fun MainNavGraph(
             )
         }
 
-        composable(route = AppRouter.GameScreen.route) {b ->
+        composable(route = AppRouter.DIFFICULTY.route) {b ->
             val id = b.arguments?.getString("id") ?: ""
-            val viewmodel = hiltViewModel<GameViewModel>()
-            GameScreen(
+            val viewmodel = hiltViewModel<DifficultyViewModel>()
+            DifficultyScreen(
                 navHostController = navHostController,
                 state = viewmodel.state,
-                e = viewmodel::events,
+                events = viewmodel::events,
                 id = id
+            )
+        }
+
+        composable(route = AppRouter.GameScreen.route) { backStackEntry ->
+            val id = backStackEntry.arguments?.getString("id") ?: ""
+            val difficulty = backStackEntry.arguments?.getString("difficulty") ?: ""
+            val viewModel = hiltViewModel<GameViewModel>()
+            GameScreen(
+                navHostController = navHostController,
+                state = viewModel.state,
+                e = viewModel::events,
+                id = id,
+                difficulty = difficulty
             )
         }
 

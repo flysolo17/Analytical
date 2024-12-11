@@ -54,6 +54,7 @@ import com.ketchupzzz.analytical.utils.getEarnings
 import com.ketchupzzz.analytical.utils.toast
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.math.sqrt
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -99,11 +100,14 @@ fun MatchingCardScreen(
     }
     if (correctScreenDialog) {
         val isLast = state.selectedIndex == state.questions.size -1
+        if  (isLast) {
+            events.invoke(MatchingCardEvents.OnSave(context))
+        }
         CorrectScreenDialog(
             message = "Your answer is correct. You earn +${args.level.points}",
             onSubmit = {
                 correctScreenDialog = !correctScreenDialog
-                events.invoke(MatchingCardEvents.OnSave(context))
+
             },
             isLast = isLast,
             onNext = {
@@ -198,31 +202,38 @@ fun MatchingCardScreen(
 @Composable
 fun MatchingCardLayout(
     modifier: Modifier = Modifier,
-    chucked : Int ,
+    chucked: Int,
     cards: List<MatchingCard>,
-    matches : List<String>,
-    onFlip : (MatchingCard) -> Unit
+    matches: List<String>,
+    onFlip: (MatchingCard) -> Unit
 ) {
+    // Calculate the number of columns and rows
+    val totalCards = chucked * 2
+    val columns = sqrt(totalCards.toDouble()).toInt()
+    val rows = (totalCards + columns - 1) / columns
+
     Column(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        cards.chunked(chucked).forEach {items ->
+        // Split cards into rows
+        cards.chunked(columns).forEach { items ->
             Row(
-                modifier = modifier.wrapContentSize()
+                modifier = Modifier.wrapContentSize(),
+                horizontalArrangement = Arrangement.Center
             ) {
-                items.forEach {
+                items.forEach { card ->
                     CardFlip(
-                        card = it,
-                        haveMatch = matches.contains(it.id),
-                        onFlip = {onFlip(it)}
+                        card = card,
+                        haveMatch = matches.contains(card.id),
+                        onFlip = { onFlip(card) }
                     )
                 }
             }
-
         }
     }
 }
+
 
 

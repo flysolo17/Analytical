@@ -229,7 +229,6 @@ fun GamingScreen(
                                 ans,
                                 points
                             ))
-
                             scope.launch {
                                 if (index < s.questions.size - 1) {
                                     pageState.animateScrollToPage(index + 1)

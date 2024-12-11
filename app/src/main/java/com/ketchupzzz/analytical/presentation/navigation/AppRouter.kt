@@ -27,11 +27,18 @@ sealed class AppRouter(val route : String) {
         }
     }
 
-    object GameScreen : AppRouter(route = "game/{id}") {
+    object DIFFICULTY: AppRouter(route = "difficulty/{id}") {
         fun createRoute(id: String): String {
-            return "game/$id"
+            return "difficulty/$id"
         }
     }
+
+    object GameScreen : AppRouter(route = "game/{id}/{difficulty}") {
+        fun createRoute(id: String, difficulty: String): String {
+            return "game/$id/$difficulty"
+        }
+    }
+
 
     object GamingScreen : AppRouter(route = "gaming/{quizAndLevel}") {
         fun createRoute(q: QuizAndLevel): String {

@@ -111,7 +111,7 @@ fun CategoryScreen(
 
                     items(state.games) {
                        QuizItem(item = it) {e->
-                           navHostController.navigate(AppRouter.GameScreen.createRoute(e))
+                           navHostController.navigate(AppRouter.GameScreen.createRoute(e,"no"))
                        }
                     }
                 }

@@ -40,6 +40,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import com.ketchupzzz.analytical.models.Category
 import com.ketchupzzz.analytical.models.SchoolLevel
 import com.ketchupzzz.analytical.models.quiz.Quiz
 import com.ketchupzzz.analytical.presentation.navigation.AppRouter
@@ -82,7 +83,6 @@ fun SearchScreen(
                 ) {
                     item {
                         OutlinedTextField(
-                           
                             modifier = modifier.fillMaxWidth(),
                             value = state.searchText,
                             label = {
@@ -106,15 +106,17 @@ fun SearchScreen(
                         Text(text = "Games (${state.filteredGames.size})", style = MaterialTheme.typography.titleLarge)
                     }
                     items(state.filteredGames) {
-//                        GameCard(
-//                            modifier = modifier,
-//                            quiz = it,
-//                            onPlay = {
-//                                it.id?.let {e ->
-//                                    navHostController.navigate(AppRouter.GameScreen.createRoute(e))
-//                                }
-//                            }
-//                        )
+                        GameCard(
+                            modifier = modifier,
+                            quiz = it,
+                            onPlay = {
+                                if (it.category == Category.PUZZLE_GAME) {
+                                    navHostController.navigate(AppRouter.DIFFICULTY.createRoute(it.id ?: ""))
+                                } else {
+                                    navHostController.navigate(AppRouter.GameScreen.createRoute(it.id ?: "","no"))
+                                }
+                            }
+                        )
                     }
                 }
             }

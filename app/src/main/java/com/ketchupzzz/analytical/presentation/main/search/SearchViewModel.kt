@@ -34,13 +34,19 @@ class SearchViewModel @Inject constructor(
     }
 
     private fun searching(text: String) {
-        state = state.copy(searchText = text)
+        val filteredGames = state.games.filter { game ->
+            game.title?.contains(text, ignoreCase = true) == true
+        }
+        state = state.copy(
+            searchText = text,
+            filteredGames = filteredGames
+        )
     }
 
 
     private fun getGames() {
         viewModelScope.launch {
-            quizRepository.getAllQuiz {
+            quizRepository.getAllGames {
                 state = when(it) {
                     is UiState.Error -> state.copy(
                         isLoading = false,

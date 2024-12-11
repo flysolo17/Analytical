@@ -13,6 +13,7 @@ import com.ketchupzzz.analytical.utils.UiState
 
 
 interface QuizRepository {
+   suspend fun getAllGames(result : (UiState<List<Quiz>>) -> Unit)
    suspend fun getAllQuiz(result : (UiState<List<CategoryWithQuiz>>) -> Unit)
    suspend fun getQuizByID(id : String,result: (UiState<QuizWithLevels>) -> Unit)
    suspend fun getAllQuizBySchoolLevel(

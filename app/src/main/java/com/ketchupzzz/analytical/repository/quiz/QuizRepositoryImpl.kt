@@ -26,6 +26,18 @@ import kotlinx.coroutines.tasks.await
 
 
 class QuizRepositoryImpl(private val firestore : FirebaseFirestore): QuizRepository {
+    override suspend fun getAllGames(result: (UiState<List<Quiz>>) -> Unit) {
+        firestore.collection(QUIZ_COLLECTION)
+            .addSnapshotListener { value, error ->
+                value?.let {
+                    result.invoke(UiState.Success(it.toObjects(Quiz::class.java)))
+                }
+                error?.let {
+                    result.invoke(UiState.Error(it.localizedMessage.toString()))
+                }
+            }
+    }
+
     override suspend fun getAllQuiz(result: (UiState<List<CategoryWithQuiz>>) -> Unit) {
         result.invoke(UiState.Loading)
         Log.d(QUIZ_COLLECTION,"LOADING")

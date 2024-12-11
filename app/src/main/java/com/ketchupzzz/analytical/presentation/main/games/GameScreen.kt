@@ -29,6 +29,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun GameScreen(
     id : String,
+    difficulty : String,
     navHostController: NavHostController,
     state: GameState,
     e : (GameEvents) -> Unit,
@@ -53,7 +54,8 @@ fun GameScreen(
             GameDataScreen(
                 state = state,
                 e = e,
-                navHostController = navHostController
+                navHostController = navHostController,
+                difficulty = difficulty
             )
         }
     }
@@ -63,6 +65,7 @@ fun GameScreen(
 @Composable
 fun GameDataScreen(
     modifier: Modifier = Modifier,
+    difficulty: String,
     state: GameState,
     e: (GameEvents) -> Unit,
     navHostController: NavHostController
@@ -103,6 +106,7 @@ fun GameDataScreen(
                         )
                     )
                 }
+
                 levelsWithSubmissions.sortedBy { it.levels.levelNumber }
                 when(page) {
                     0 -> LevelsPage(
@@ -110,7 +114,8 @@ fun GameDataScreen(
                         levelsWithSubmissions,
                         state = state,
                         e =  e,
-                        navHostController = navHostController
+                        navHostController = navHostController,
+                        difficulty = difficulty
                     )
                     1 -> SubmissionsPage(
                         s = state,

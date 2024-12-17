@@ -127,7 +127,7 @@ fun Date.toDisplayDate(): String {
 }
 
 fun Students.getStudentFullname() : String {
-    return "${this.fname} ${this.mname?.get(0)}. ${this.lname}"
+    return "${this.fname} ${this.mname?.getOrNull(0)}. ${this.lname}"
 }
 
 

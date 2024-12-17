@@ -46,7 +46,8 @@ fun ChoicesLayout(
 
     Column(
         modifier = modifier
-            .wrapContentSize(),
+            .wrapContentSize()
+            .padding(16.dp),
     ) {
         question.choices.forEachIndexed { index, choice ->
             Button(

@@ -86,7 +86,7 @@ fun CorrectScreenDialog(
                         }
                     }
                 ) { Text(
-                    text = if (isLast) "Submit" else "Next Question"
+                    text = if (isLast) "Exit Game" else "Next Question"
                 ) }
             }
         }

@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.ketchupzzz.analytical.presentation.main.games.components.GameAppBar
 import com.ketchupzzz.analytical.presentation.main.games.data.QuizAndLevel
 import com.ketchupzzz.analytical.presentation.navigation.AppRouter
 import com.ketchupzzz.analytical.utils.UnknownError
@@ -62,23 +63,7 @@ fun DifficultyScreen(
     val currentLevel = state.levelsWithSubmissions.getMyCurrentLevel()
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text("Select Difficulty")
-                },
-                navigationIcon = {
-                    IconButton(
-                        onClick = {
-                            navHostController.popBackStack()
-                        }
-                    ) { Icon(
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = "back"
-                    ) }
-                }
-            )
-        }
+        topBar = { GameAppBar(quiz = state.quiz, navHostController = navHostController) }
     ) {
 
         Column(
@@ -94,35 +79,24 @@ fun DifficultyScreen(
                 state.errors != null -> UnknownError(title = state.errors) {
                     Button(onClick = {navHostController.popBackStack()}) { Text("Back") }
                 } else -> {
-                Text("${state.quiz?.title}", style = MaterialTheme.typography.titleLarge.copy(textAlign = TextAlign.Center))
-                Spacer(
-                    modifier = modifier.height(8.dp)
-                )
-                Text("${state.quiz?.desc}", style = MaterialTheme.typography.labelSmall.copy(
-                    color = Color.Gray,
-                    textAlign = TextAlign.Center
-                ))
-                Spacer(
-                    modifier = modifier.height(16.dp)
-                )
-                DifficultyCard(
-                    difficulty = "Easy",
-                    isEnabled = true
-                ) {
-                    navHostController.navigate(AppRouter.GameScreen.createRoute(id,"easy"))
-                }
-                DifficultyCard(
-                    difficulty = "Medium",
-                    isEnabled = currentLevel in 11..20
-                ) {
-                    navHostController.navigate(AppRouter.GameScreen.createRoute(id,"medium"))
-                }
-                DifficultyCard(
-                    difficulty = "Hard",
-                    isEnabled = currentLevel > 21
-                ) {
-                    navHostController.navigate(AppRouter.GameScreen.createRoute(id,"hard"))
-                }
+                    DifficultyCard(
+                        difficulty = "Easy",
+                        isEnabled = true
+                    ) {
+                        navHostController.navigate(AppRouter.GameScreen.createRoute(id,"easy"))
+                    }
+                    DifficultyCard(
+                        difficulty = "Medium",
+                        isEnabled = currentLevel in 11..20
+                    ) {
+                        navHostController.navigate(AppRouter.GameScreen.createRoute(id,"medium"))
+                    }
+                    DifficultyCard(
+                        difficulty = "Hard",
+                        isEnabled = currentLevel > 21
+                    ) {
+                        navHostController.navigate(AppRouter.GameScreen.createRoute(id,"hard"))
+                    }
                 }
             }
 

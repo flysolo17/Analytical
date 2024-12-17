@@ -63,7 +63,7 @@ class LeaderBoardViewModel @Inject constructor(
             studentRepository.getStudents { result ->
                 state = when(result) {
                     is UiState.Error ->state.copy(
-                        isLoading = true,
+                        isLoading = false,
                         errors = result.message
                     )
                     UiState.Loading -> state.copy(

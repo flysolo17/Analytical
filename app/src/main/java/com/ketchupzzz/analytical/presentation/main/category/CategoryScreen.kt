@@ -34,6 +34,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.ketchupzzz.analytical.models.Category
 import com.ketchupzzz.analytical.presentation.main.dashboard.QuizItem
 import com.ketchupzzz.analytical.presentation.main.search.GameCard
 import com.ketchupzzz.analytical.presentation.main.search.SearchEvents
@@ -111,7 +112,11 @@ fun CategoryScreen(
 
                     items(state.games) {
                        QuizItem(item = it) {e->
-                           navHostController.navigate(AppRouter.GameScreen.createRoute(e,"no"))
+                           if (it.category == Category.PUZZLE_GAME) {
+                               navHostController.navigate(AppRouter.DIFFICULTY.createRoute(it.id ?: ""))
+                           } else {
+                               navHostController.navigate(AppRouter.GameScreen.createRoute(it.id ?: "","no"))
+                           }
                        }
                     }
                 }
